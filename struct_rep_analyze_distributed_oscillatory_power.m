@@ -17,21 +17,27 @@ for k=1:length(d_data)
     subj=subj.(subj_id{1});
     data=subj.data;
     info=subj.info;
-    % sentences 
-    cond='S';
-    trial_type=info.word_type;
-    cond_id=find(cellfun(@(x) x==cond,trial_type));
-    data_cond=data(cond_id );
-    % stimuli to find in the condition trial 
-    stim='word';
-    stim_loc=cellfun(@(x) find(strcmp(x.stimuli_type,stim)), data_cond,'uni',false);
-    hilb_zs_ave_cell=cellfun(@(x) x.signal_ave_hilbert_zs_downsample_parsed, data_cond,'uni',false);
-    stim_zs_ave_cell=arrayfun(@(x) hilb_zs_ave_cell{x}(stim_loc{x}),[1:size(hilb_zs_ave_cell,1)],'uni',false );
-    % reshape stim to correct form if it is not 
-    stim_zs_ave_cell=cellfun(@(x) cell2mat(reshape(x,1,[])),stim_zs_ave_cell,'uni',false );
-    % tensor format (elec*stim(words)*trial)
-    stim_zs_ave_tensor=double(cell2mat(permute(stim_zs_ave_cell,[1,3,2])));
-    % combine trials for the condition
-    sent_word_hilb_ave_tensor_all=cat(3,sent_word_hilb_ave_tensor_all,stim_zs_ave_tensor);
-    fprintf('added %s\n', d_data{k})
+    % sentences
+    cond_list={'S', 'W'}; 
+    for i=1:length(cond_list)
+        cond=cond_list{i};
+        trial_type=info.word_type;
+        cond_id=find(cellfun(@(x) x==cond,trial_type));
+        data_cond=data(cond_id );
+        % stimuli to find in the condition trial 
+        stim_list={'word', 'probe'};
+        for j=1:length(stim_list)
+            stim=stim_list{j};
+            stim_loc=cellfun(@(x) find(strcmp(x.stimuli_type,stim)), data_cond,'uni',false);
+            hilb_zs_ave_cell=cellfun(@(x) x.signal_ave_hilbert_zs_downsample_parsed, data_cond,'uni',false);
+            stim_zs_ave_cell=arrayfun(@(x) hilb_zs_ave_cell{x}(stim_loc{x}),[1:size(hilb_zs_ave_cell,1)],'uni',false );
+            % reshape stim to correct form if it is not 
+            stim_zs_ave_cell=cellfun(@(x) cell2mat(reshape(x,1,[])),stim_zs_ave_cell,'uni',false );
+            % tensor format (elec*stim(words)*trial)
+            stim_zs_ave_tensor=double(cell2mat(permute(stim_zs_ave_cell,[1,3,2])));
+            % combine trials for the condition
+            sent_word_hilb_ave_tensor_all=cat(3,sent_word_hilb_ave_tensor_all,stim_zs_ave_tensor);
+            fprintf('added %s\n', d_data{k})
+        end
+    end
 end 
