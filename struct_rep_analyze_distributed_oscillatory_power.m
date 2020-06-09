@@ -3,12 +3,12 @@ clear all
 close all
 home 
 %% specify where the data is
-data_path='~/MyData/struct_rep/crunched/';
-analysis_path=strcat(data_path,'analysis/distributed_oscilatory_power/');
+data_path='C:\Users\kirsi\Documents\Git\UROP\struct_rep\data';
+analysis_path=strcat(data_path,'analysis\distributed_oscilatory_power\');
 subject_id='AMC026';
-d_data= dir(strcat(data_path,'/',subject_id,'*_crunched_v2.mat'));
-fprintf(' %d .mat files were found \n', length(d_sn));
-d_data=arrayfun(@(x) strcat(d_data(x).folder,'/',d_data(x).name),[1:length(d_data)]','uni',false);
+d_data= dir(strcat(data_path,'\',subject_id,'*_crunched_v2.mat'));
+fprintf(' %d .mat files were found \n', length(d_data));
+d_data=arrayfun(@(x) strcat(d_data(x).folder,'\',d_data(x).name),[1:length(d_data)]','uni',false);
 %% combine responses from all sessions for a given condition. (S= sentence,....)
 sent_word_hilb_ave_tensor_all=[];
 for k=1:length(d_data)
