@@ -102,11 +102,13 @@ subplot(1,2,2)
 imagesc(cell2mat(wlist_angle'));
 colorbar()
 title('cosine angle between wordlist and probe');
-% subplot(1,2,3)
-% imagesc(cell2mat(jab_angle'));
-% colorbar()
-% title('cosine angle between jabber and probe');
-% subplot(1,2,4)
-% imagesc(cell2mat(non_angle'));
-% colorbar()
-% title('cosine angle between nonwords and probe');
+
+figure;
+subplot(1,2,1)
+imagesc(cell2mat(jab_angle'));
+colorbar()
+title('cosine angle between jabber and probe');
+subplot(1,2,2)
+imagesc(cell2mat(non_angle'));
+colorbar()
+title('cosine angle between nonwords and probe');
