@@ -98,7 +98,26 @@ word_tensor=non_word_hilb_ave_tensor_all;
 probe_tensor=non_probe_hilb_ave_tensor_all;
 non_angle=calc_similarities(word_tensor,probe_tensor);
 
-%%create figures to compare angles between each condition
+%%figure with all 4 condtions on it
+figure;
+subplot(2,2,1);
+imagesc(cell2mat(transpose(sentence_angle)));
+colorbar();
+title('angle b/w sentence and probe');
+subplot(2,2,2);
+imagesc(cell2mat(transpose(wlist_angle)));
+colorbar();
+title('angle b/w wordlist and probe');
+subplot(2,2,3);
+imagesc(cell2mat(transpose(jab_angle)));
+colorbar();
+title('angle b/w jabber and probe');
+subplot(2,2,4);
+imagesc(cell2mat(transpose(non_angle)));
+colorbar();
+title('angle b/w nonword and probe');
+
+%%create figures with every combo of 2 conditions
 %sentence to wlist comparison
 angle1=sentence_angle;
 angle2=wlist_angle;
