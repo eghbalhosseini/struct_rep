@@ -27,12 +27,8 @@ for k=1:length(d_data) %for each participant
             if ~any(strcmp(word_string, probe)) %probe not in sequence
                 position_matrix=cat(1, position_matrix, 0);
             else %find position of probe
-                for i=1:length(word_string);
-                    if isequal(word_string{i,1}, probe);
-                        position_matrix=cat(1, position_matrix, i);
-                        break;
-                    end
-                end
+                probe_position=find(strcmp(word_string,probe));
+                position_matrix=cat(1,position_matrix, probe_position);
             end
         end
     end
