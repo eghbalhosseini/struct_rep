@@ -18,7 +18,7 @@ for k=1:length(d_data) %for each participant
     
     for j=1:length(data) %for each trial
         if isempty(data{j,1}.trial_string) %fixation trial
-            position_matrix=cat(1, position_matrix, 0);
+            position_matrix=cat(1, position_matrix, -1);
         else
             word_string=data{j,1}.trial_string(2:end);
             word_string=split(word_string,[" "]);
