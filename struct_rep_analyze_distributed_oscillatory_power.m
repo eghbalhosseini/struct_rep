@@ -20,6 +20,7 @@ jab_word_hilb_ave_tensor_all=[];
 jab_probe_hilb_ave_tensor_all=[];
 non_word_hilb_ave_tensor_all=[];
 non_probe_hilb_ave_tensor_all=[];
+
 sent_word_hilb_ave_tensor_lang=[];
 sent_probe_hilb_ave_tensor_lang=[];
 wlist_word_hilb_ave_tensor_lang=[];
@@ -112,6 +113,56 @@ for k=1:length(d_data)
     data_out_lang=data_out_all.*info.significant_and_positive_channels;
     non_probe_hilb_ave_tensor_lang=cat(3,non_probe_hilb_ave_tensor_lang,data_out_lang);
 end 
+%%Sort tensors according to probe positions
+%Create vector with all positions across participants for each condition
+sent_positions=[];
+wlist_positions=[];
+jab_positions=[];
+non_positions=[];
+
+for k=1:length(d_data)
+    subj=load(d_data{k});
+    subj_id=fieldnames(subj);
+    subj=subj.(subj_id{1});
+    data=subj.data;
+    info=subj.info;
+    
+    temp_sent_pos=get_positions(info,'S');
+    sent_positions=cat(1, sent_positions, temp_sent_pos);
+    
+    temp_wlist_pos=get_positions(info,'W');
+    wlist_positions=cat(1, wlist_positions, temp_wlist_pos);
+    
+    temp_jab_pos=get_positions(info,'J');
+    jab_positions=cat(1, jab_positions, temp_jab_pos);
+    
+    temp_non_pos=get_positions(info,'N');
+    non_positions=cat(1, non_positions, temp_non_pos);
+end
+%Sort pos vecs ascending order, sort tensors the same way
+[sent_positions, index]=sort(sent_positions);
+sent_word_hilb_ave_tensor_all=sent_word_hilb_ave_tensor_all(:,:,index);
+sent_probe_hilb_ave_tensor_all=sent_probe_hilb_ave_tensor_all(:,:,index);
+sent_word_hilb_ave_tensor_lang=sent_word_hilb_ave_tensor_lang(:,:,index);
+sent_probe_hilb_ave_tensor_lang=sent_probe_hilb_ave_tensor_lang(:,:,index);
+
+[wlist_positions, index]=sort(wlist_positions);
+wlist_word_hilb_ave_tensor_all=wlist_word_hilb_ave_tensor_all(:,:,index);
+wlist_probe_hilb_ave_tensor_all=wlist_probe_hilb_ave_tensor_all(:,:,index);
+wlist_word_hilb_ave_tensor_lang=wlist_word_hilb_ave_tensor_lang(:,:,index);
+wlist_probe_hilb_ave_tensor_lang=wlist_probe_hilb_ave_tensor_lang(:,:,index);
+
+[jab_positions, index]=sort(jab_positions);
+jab_word_hilb_ave_tensor_all=jab_word_hilb_ave_tensor_all(:,:,index);
+jab_probe_hilb_ave_tensor_all=jab_probe_hilb_ave_tensor_all(:,:,index);
+jab_word_hilb_ave_tensor_lang=jab_word_hilb_ave_tensor_lang(:,:,index);
+jab_probe_hilb_ave_tensor_lang=jab_probe_hilb_ave_tensor_lang(:,:,index);
+
+[non_positions, index]=sort(non_positions);
+non_word_hilb_ave_tensor_all=non_word_hilb_ave_tensor_all(:,:,index);
+non_probe_hilb_ave_tensor_all=non_probe_hilb_ave_tensor_all(:,:,index);
+non_word_hilb_ave_tensor_lang=non_word_hilb_ave_tensor_lang(:,:,index);
+non_probe_hilb_ave_tensor_lang=non_probe_hilb_ave_tensor_lang(:,:,index);
 
 %% compute a cosine distance between word representation over all electrodes during sentence and during probe
 % sentence condition all
