@@ -2,6 +2,9 @@ function data_out=extract_condition_response(data,info,cond,stim)
 trial_type=info.word_type;
 cond_id=find(cellfun(@(x) x==cond,trial_type));
 data_cond=data(cond_id);
+probe_positions=get_positions(info,cond)
+[probe_positions, index]=sort(probe_positions)
+data_cond=data_cond(index)
 stim_loc=cellfun(@(x) find(strcmp(x.stimuli_type,stim)), data_cond,'uni',false);
 hilb_zs_ave_cell=cellfun(@(x) x.signal_ave_hilbert_zs_downsample_parsed, data_cond,'uni',false);
 stim_zs_ave_cell=arrayfun(@(x) hilb_zs_ave_cell{x}(stim_loc{x}),[1:size(hilb_zs_ave_cell,1)],'uni',false );
