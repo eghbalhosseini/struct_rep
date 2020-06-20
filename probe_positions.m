@@ -27,8 +27,14 @@ for k=1:length(d_data) %for each participant
             if ~any(strcmp(word_string, probe)) %probe not in sequence
                 position_matrix=cat(1, position_matrix, 0);
             else %find position of probe
-                probe_position=find(strcmp(word_string,probe));
-                position_matrix=cat(1,position_matrix, probe_position);
+               probe_position=find(strcmp(word_string,probe));
+               if length(probe_position)>1
+                   info.word_type{j,1}='P';
+                   probe_position=probe_position(1);
+                   position_matrix=cat(1,position_matrix, probe_position);
+               else
+                   position_matrix=cat(1,position_matrix, probe_position);
+               end
             end
         end
     end
@@ -40,7 +46,6 @@ for k=1:length(d_data) %for each participant
     eval(strcat(subject_name,'_',session_name,'.info=info;'));
     save(d_data{k},strcat(subject_name,'_',session_name),'-v7.3');
 end
-        
                 
             
         
