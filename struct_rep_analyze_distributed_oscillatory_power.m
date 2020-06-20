@@ -164,45 +164,85 @@ non_probe_hilb_ave_tensor_all=non_probe_hilb_ave_tensor_all(:,:,index);
 non_word_hilb_ave_tensor_lang=non_word_hilb_ave_tensor_lang(:,:,index);
 non_probe_hilb_ave_tensor_lang=non_probe_hilb_ave_tensor_lang(:,:,index);
 
-%% compute a cosine distance between word representation over all electrodes during sentence and during probe
+%%Take average of trials with same probe position
+%find indices of sorted pos vec where pos changes
+sent_changes=diff(sent_positions);
+sent_change_indices=find(ismember(sent_changes,1));
+sent_change_indices=sent_change_indices+1;
+
+wlist_changes=diff(wlist_positions);
+wlist_change_indices=find(ismember(wlist_changes,1));
+wlist_change_indices=wlist_change_indices+1;
+
+jab_changes=diff(jab_positions);
+jab_change_indices=find(ismember(jab_changes,1));
+jab_change_indices=jab_change_indices+1;
+
+non_changes=diff(non_positions);
+non_change_indices=find(ismember(non_changes,1));
+non_change_indices=non_change_indices+1;
+
+%Take average of trials at each probe position
+sent_word_hilb_ave_ten_all=probe_pos_ave_trials(sent_change_indices, sent_word_hilb_ave_tensor_all);
+sent_probe_hilb_ave_ten_all=probe_pos_ave_trials(sent_change_indices, sent_probe_hilb_ave_tensor_all);
+sent_word_hilb_ave_ten_lang=probe_pos_ave_trials(sent_change_indices, sent_word_hilb_ave_tensor_lang);
+sent_probe_hilb_ave_ten_lang=probe_pos_ave_trials(sent_change_indices, sent_probe_hilb_ave_tensor_lang); 
+
+wlist_word_hilb_ave_ten_all=probe_pos_ave_trials(wlist_change_indices, wlist_word_hilb_ave_tensor_all);
+wlist_probe_hilb_ave_ten_all=probe_pos_ave_trials(wlist_change_indices, wlist_probe_hilb_ave_tensor_all);
+wlist_word_hilb_ave_ten_lang=probe_pos_ave_trials(wlist_change_indices, wlist_word_hilb_ave_tensor_lang);
+wlist_probe_hilb_ave_ten_lang=probe_pos_ave_trials(wlist_change_indices, wlist_probe_hilb_ave_tensor_lang);    
+
+jab_word_hilb_ave_ten_all=probe_pos_ave_trials(jab_change_indices, jab_word_hilb_ave_tensor_all);
+jab_probe_hilb_ave_ten_all=probe_pos_ave_trials(jab_change_indices, jab_probe_hilb_ave_tensor_all);
+jab_word_hilb_ave_ten_lang=probe_pos_ave_trials(jab_change_indices, jab_word_hilb_ave_tensor_lang);
+jab_probe_hilb_ave_ten_lang=probe_pos_ave_trials(jab_change_indices, jab_probe_hilb_ave_tensor_lang); 
+
+non_word_hilb_ave_ten_all=probe_pos_ave_trials(non_change_indices, non_word_hilb_ave_tensor_all);
+non_probe_hilb_ave_ten_all=probe_pos_ave_trials(non_change_indices, non_probe_hilb_ave_tensor_all);
+non_word_hilb_ave_ten_lang=probe_pos_ave_trials(non_change_indices, non_word_hilb_ave_tensor_lang);
+non_probe_hilb_ave_ten_lang=probe_pos_ave_trials(non_change_indices, non_probe_hilb_ave_tensor_lang); 
+
+%% compute a cosine distance over all electrodes to compare word & probe conditions
+
 % sentence condition all
-word_tensor=sent_word_hilb_ave_tensor_all;
-probe_tensor=sent_probe_hilb_ave_tensor_all;
+word_tensor=sent_word_hilb_ave_ten_all;
+probe_tensor=sent_probe_hilb_ave_ten_all;
 sentence_angle=calc_similarities(word_tensor,probe_tensor);
 
 %sentence condition lang responsive
-word_tensor=sent_word_hilb_ave_tensor_lang;
-probe_tensor=sent_probe_hilb_ave_tensor_lang;
+word_tensor=sent_word_hilb_ave_ten_lang;
+probe_tensor=sent_probe_hilb_ave_ten_lang;
 sentence_angle_lang=calc_similarities(word_tensor,probe_tensor);
 
 % wordlist condition all
-word_tensor=wlist_word_hilb_ave_tensor_all;
-probe_tensor=wlist_probe_hilb_ave_tensor_all;
+word_tensor=wlist_word_hilb_ave_ten_all;
+probe_tensor=wlist_probe_hilb_ave_ten_all;
 wlist_angle=calc_similarities(word_tensor,probe_tensor);
 
 %wordlist condition lang responsive
-word_tensor=wlist_word_hilb_ave_tensor_lang;
-probe_tensor=wlist_probe_hilb_ave_tensor_lang;
+word_tensor=wlist_word_hilb_ave_ten_lang;
+probe_tensor=wlist_probe_hilb_ave_ten_lang;
 wlist_angle_lang=calc_similarities(word_tensor,probe_tensor);
 
 % jabber condition all
-word_tensor=jab_word_hilb_ave_tensor_all;
-probe_tensor=jab_probe_hilb_ave_tensor_all;
+word_tensor=jab_word_hilb_ave_ten_all;
+probe_tensor=jab_probe_hilb_ave_ten_all;
 jab_angle=calc_similarities(word_tensor,probe_tensor);
 
 %jabber condition lang responsive
-word_tensor=jab_word_hilb_ave_tensor_lang;
-probe_tensor=jab_probe_hilb_ave_tensor_lang;
+word_tensor=jab_word_hilb_ave_ten_lang;
+probe_tensor=jab_probe_hilb_ave_ten_lang;
 jab_angle_lang=calc_similarities(word_tensor,probe_tensor);
 
 % nonword condition all
-word_tensor=non_word_hilb_ave_tensor_all;
-probe_tensor=non_probe_hilb_ave_tensor_all;
+word_tensor=non_word_hilb_ave_ten_all;
+probe_tensor=non_probe_hilb_ave_ten_all;
 non_angle=calc_similarities(word_tensor,probe_tensor);
 
 % nonword condition lang responsive
-word_tensor=non_word_hilb_ave_tensor_lang;
-probe_tensor=non_probe_hilb_ave_tensor_lang;
+word_tensor=non_word_hilb_ave_ten_lang;
+probe_tensor=non_probe_hilb_ave_ten_lang;
 non_angle_lang=calc_similarities(word_tensor,probe_tensor);
 
 %%figure with 4 condtions of all electrodes on it
@@ -243,9 +283,9 @@ imagesc(cell2mat(transpose(non_angle_lang)));
 colorbar();
 title('angle b/w N and probe, lang resp');
 
-%% create_figure function: create figures with any combo of 2 conditions
-%sentence to wlist comparison
-angle1=sentence_angle;
-angle2=wlist_angle;
-s_w_image=create_figure(angle1,'sentence',angle2,'wordlist');
+% %% create_figure function: create figures with any combo of 2 conditions
+% %sentence to wlist comparison
+% angle1=sentence_angle;
+% angle2=wlist_angle;
+% s_w_image=create_figure(angle1,'sentence',angle2,'wordlist');
 
