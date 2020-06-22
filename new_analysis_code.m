@@ -133,6 +133,27 @@ jab_probe_tensor_all=probe_pos_ave_trials(jab_change_indices, jab_probe_tensor_a
 non_word_tensor_all=probe_pos_ave_trials(non_change_indices, non_word_tensor_all);
 non_probe_tensor_all=probe_pos_ave_trials(non_change_indices, non_probe_tensor_all);
 
+%% Only use valid channels
+scale_matrix=repmat(info.valid_channels,1,40);
+sent_word_tensor_all=sent_word_tensor_all.*scale_matrix;
+scale_matrix=repmat(info.valid_channels,1,5);
+sent_probe_tensor_all=sent_probe_tensor_all.*scale_matrix;
+
+scale_matrix=repmat(info.valid_channels,1,40);
+wlist_word_tensor_all=wlist_word_tensor_all.*scale_matrix;
+scale_matrix=repmat(info.valid_channels,1,5);
+wlist_probe_tensor_all=wlist_probe_tensor_all.*scale_matrix;
+
+scale_matrix=repmat(info.valid_channels,1,40);
+jab_word_tensor_all=jab_word_tensor_all.*scale_matrix;
+scale_matrix=repmat(info.valid_channels,1,5);
+jab_probe_tensor_all=jab_probe_tensor_all.*scale_matrix;
+
+scale_matrix=repmat(info.valid_channels,1,40);
+non_word_tensor_all=non_word_tensor_all.*scale_matrix;
+scale_matrix=repmat(info.valid_channels,1,5);
+non_probe_tensor_all=non_probe_tensor_all.*scale_matrix;
+
 %% Separate tensors into each frequency type
 sent_word_freq_tensors_all=separate_frequencies(sent_word_tensor_all, 'word');
 sent_probe_freq_tensors_all=separate_frequencies(sent_probe_tensor_all, 'prob');
@@ -179,25 +200,25 @@ for i=1:length(non_word_freq_tensors_all)
     non_angles_all{i,1}=calc_similarities(word_tensor,probe_tensor);
 end
 
-%%figure with 4 condtions on it
+%% figure with 4 condtions on it
 for i=1:5
     figure;
     subplot(2,2,1);
     imagesc(cell2mat(transpose(sentence_angles_all{i,1})));
     colorbar();
-    title('angle b/w S & probe, lang resp');
+    title('angle b/w S & probe');
     subplot(2,2,2);
     imagesc(cell2mat(transpose(wlist_angles_all{i,1})));
     colorbar();
-    title('angle b/w W and probe, lang resp');
+    title('angle b/w W and probe');
     subplot(2,2,3);
     imagesc(cell2mat(transpose(jab_angles_all{i,1})));
     colorbar();
-    title('angle b/w J and probe, lang resp');
+    title('angle b/w J and probe');
     subplot(2,2,4);
     imagesc(cell2mat(transpose(non_angles_all{i,1})));
     colorbar();
-    title('angle b/w N and probe, lang resp');
+    title('angle b/w N and probe');
 end
 
 % %% create_figure function: create figures with any combo of 2 conditions
