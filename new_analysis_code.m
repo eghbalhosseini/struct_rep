@@ -102,36 +102,36 @@ jab_probe_tensor_all=jab_probe_tensor_all(:,:,index);
 non_word_tensor_all=non_word_tensor_all(:,:,index);
 non_probe_tensor_all=non_probe_tensor_all(:,:,index);
 
-% Take average of trials with same probe position
-%find indices of sorted pos vec where pos changes
-sent_changes=diff(sent_positions);
-sent_change_indices=find(ismember(sent_changes,1));
-sent_change_indices=sent_change_indices+1;
-
-wlist_changes=diff(wlist_positions);
-wlist_change_indices=find(ismember(wlist_changes,1));
-wlist_change_indices=wlist_change_indices+1;
-
-jab_changes=diff(jab_positions);
-jab_change_indices=find(ismember(jab_changes,1));
-jab_change_indices=jab_change_indices+1;
-
-non_changes=diff(non_positions);
-non_change_indices=find(ismember(non_changes,1));
-non_change_indices=non_change_indices+1;
-
-%Take average of trials at each probe position
-sent_word_tensor_all=probe_pos_ave_trials(sent_change_indices, sent_word_tensor_all);
-sent_probe_tensor_all=probe_pos_ave_trials(sent_change_indices, sent_probe_tensor_all); 
-
-wlist_word_tensor_all=probe_pos_ave_trials(wlist_change_indices, wlist_word_tensor_all);
-wlist_probe_tensor_all=probe_pos_ave_trials(wlist_change_indices, wlist_probe_tensor_all);    
-
-jab_word_tensor_all=probe_pos_ave_trials(jab_change_indices, jab_word_tensor_all);
-jab_probe_tensor_all=probe_pos_ave_trials(jab_change_indices, jab_probe_tensor_all); 
-
-non_word_tensor_all=probe_pos_ave_trials(non_change_indices, non_word_tensor_all);
-non_probe_tensor_all=probe_pos_ave_trials(non_change_indices, non_probe_tensor_all);
+% %% Take average of trials with same probe position
+% %find indices of sorted pos vec where pos changes
+% sent_changes=diff(sent_positions);
+% sent_change_indices=find(ismember(sent_changes,1));
+% sent_change_indices=sent_change_indices+1;
+% 
+% wlist_changes=diff(wlist_positions);
+% wlist_change_indices=find(ismember(wlist_changes,1));
+% wlist_change_indices=wlist_change_indices+1;
+% 
+% jab_changes=diff(jab_positions);
+% jab_change_indices=find(ismember(jab_changes,1));
+% jab_change_indices=jab_change_indices+1;
+% 
+% non_changes=diff(non_positions);
+% non_change_indices=find(ismember(non_changes,1));
+% non_change_indices=non_change_indices+1;
+% 
+% %Take average of trials at each probe position
+% sent_word_tensor_all=probe_pos_ave_trials(sent_change_indices, sent_word_tensor_all);
+% sent_probe_tensor_all=probe_pos_ave_trials(sent_change_indices, sent_probe_tensor_all); 
+% 
+% wlist_word_tensor_all=probe_pos_ave_trials(wlist_change_indices, wlist_word_tensor_all);
+% wlist_probe_tensor_all=probe_pos_ave_trials(wlist_change_indices, wlist_probe_tensor_all);    
+% 
+% jab_word_tensor_all=probe_pos_ave_trials(jab_change_indices, jab_word_tensor_all);
+% jab_probe_tensor_all=probe_pos_ave_trials(jab_change_indices, jab_probe_tensor_all); 
+% 
+% non_word_tensor_all=probe_pos_ave_trials(non_change_indices, non_word_tensor_all);
+% non_probe_tensor_all=probe_pos_ave_trials(non_change_indices, non_probe_tensor_all);
 
 %% Only use valid channels
 scale_matrix=repmat(info.valid_channels,1,40);
@@ -177,7 +177,7 @@ for i=1:length(sent_word_freq_tensors_all)
 end
 sentence_angles_mat=[];
 for j=1:length(sentence_angles_all)
-    temp=cell2mat(transpose(sentence_angles_all{i,1}));
+    temp=cell2mat(transpose(sentence_angles_all{j,1}));
     sentence_angles_mat=cat(1,sentence_angles_mat,temp);
 end
 
@@ -190,7 +190,7 @@ for i=1:length(wlist_word_freq_tensors_all)
 end
 wlist_angles_mat=[];
 for j=1:length(wlist_angles_all)
-    temp=cell2mat(transpose(wlist_angles_all{i,1}));
+    temp=cell2mat(transpose(wlist_angles_all{j,1}));
     wlist_angles_mat=cat(1,wlist_angles_mat,temp);
 end
 
@@ -202,7 +202,7 @@ for i=1:length(jab_word_freq_tensors_all)
 end
 jab_angles_mat=[];
 for j=1:length(jab_angles_all)
-    temp=cell2mat(transpose(jab_angles_all{i,1}));
+    temp=cell2mat(transpose(jab_angles_all{j,1}));
     jab_angles_mat=cat(1,jab_angles_mat,temp);
 end
 
@@ -215,7 +215,7 @@ for i=1:length(non_word_freq_tensors_all)
 end
 non_angles_mat=[];
 for j=1:length(non_angles_all)
-    temp=cell2mat(transpose(non_angles_all{i,1}));
+    temp=cell2mat(transpose(non_angles_all{j,1}));
     non_angles_mat=cat(1,non_angles_mat,temp);
 end
 %% figure with 4 condtions on it
