@@ -102,7 +102,7 @@ jab_probe_tensor_all=jab_probe_tensor_all(:,:,index);
 non_word_tensor_all=non_word_tensor_all(:,:,index);
 non_probe_tensor_all=non_probe_tensor_all(:,:,index);
 
-%% Take average of trials with same probe position
+% Take average of trials with same probe position
 %find indices of sorted pos vec where pos changes
 sent_changes=diff(sent_positions);
 sent_change_indices=find(ismember(sent_changes,1));
@@ -168,58 +168,94 @@ non_word_freq_tensors_all=separate_frequencies(non_word_tensor_all, 'word');
 non_probe_freq_tensors_all=separate_frequencies(non_probe_tensor_all, 'prob');
 
 %% compute a cosine distance over all electrodes to compare word & probe conditions
-%sentence condition lang responsive
+%sentence condition
 sentence_angles_all={};
 for i=1:length(sent_word_freq_tensors_all)
     word_tensor=sent_word_freq_tensors_all{i,1};
     probe_tensor=sent_probe_freq_tensors_all{i,1};
     sentence_angles_all{i,1}=calc_similarities(word_tensor,probe_tensor);
 end
+sentence_angles_mat=[];
+for j=1:length(sentence_angles_all)
+    temp=cell2mat(transpose(sentence_angles_all{i,1}));
+    sentence_angles_mat=cat(1,sentence_angles_mat,temp);
+end
 
-%wordlist condition lang responsive
+%wordlist condition
 wlist_angles_all={};
 for i=1:length(wlist_word_freq_tensors_all)
     word_tensor=wlist_word_freq_tensors_all{i,1};
     probe_tensor=wlist_probe_freq_tensors_all{i,1};
     wlist_angles_all{i,1}=calc_similarities(word_tensor,probe_tensor);
 end
+wlist_angles_mat=[];
+for j=1:length(wlist_angles_all)
+    temp=cell2mat(transpose(wlist_angles_all{i,1}));
+    wlist_angles_mat=cat(1,wlist_angles_mat,temp);
+end
 
-%jabber condition lang responsive
-jab_angles_all={};
+%jabber condition
 for i=1:length(jab_word_freq_tensors_all)
     word_tensor=jab_word_freq_tensors_all{i,1};
     probe_tensor=jab_probe_freq_tensors_all{i,1};
     jab_angles_all{i,1}=calc_similarities(word_tensor,probe_tensor);
 end
+jab_angles_mat=[];
+for j=1:length(jab_angles_all)
+    temp=cell2mat(transpose(jab_angles_all{i,1}));
+    jab_angles_mat=cat(1,jab_angles_mat,temp);
+end
 
-% nonword condition lang responsive
+%nonword condition
 non_angles_all={};
 for i=1:length(non_word_freq_tensors_all)
     word_tensor=non_word_freq_tensors_all{i,1};
     probe_tensor=non_probe_freq_tensors_all{i,1};
     non_angles_all{i,1}=calc_similarities(word_tensor,probe_tensor);
 end
-
-%% figure with 4 condtions on it
-for i=1:5
-    figure;
-    subplot(2,2,1);
-    imagesc(cell2mat(transpose(sentence_angles_all{i,1})));
-    colorbar();
-    title('angle b/w S & probe');
-    subplot(2,2,2);
-    imagesc(cell2mat(transpose(wlist_angles_all{i,1})));
-    colorbar();
-    title('angle b/w W and probe');
-    subplot(2,2,3);
-    imagesc(cell2mat(transpose(jab_angles_all{i,1})));
-    colorbar();
-    title('angle b/w J and probe');
-    subplot(2,2,4);
-    imagesc(cell2mat(transpose(non_angles_all{i,1})));
-    colorbar();
-    title('angle b/w N and probe');
+non_angles_mat=[];
+for j=1:length(non_angles_all)
+    temp=cell2mat(transpose(non_angles_all{i,1}));
+    non_angles_mat=cat(1,non_angles_mat,temp);
 end
+%% figure with 4 condtions on it
+% for i=1:5
+%     figure;
+%     subplot(2,2,1);
+%     imagesc(cell2mat(transpose(sentence_angles_all{i,1})));
+%     colorbar();
+%     title('angle b/w S & probe');
+%     subplot(2,2,2);
+%     imagesc(cell2mat(transpose(wlist_angles_all{i,1})));
+%     colorbar();
+%     title('angle b/w W and probe');
+%     subplot(2,2,3);
+%     imagesc(cell2mat(transpose(jab_angles_all{i,1})));
+%     colorbar();
+%     title('angle b/w J and probe');
+%     subplot(2,2,4);
+%     imagesc(cell2mat(transpose(non_angles_all{i,1})));
+%     colorbar();
+%     title('angle b/w N and probe');
+% end
+
+figure;
+subplot(2,2,1);
+imagesc(sentence_angles_mat);
+colorbar();
+title('angle b/w S & probe');
+subplot(2,2,2);
+imagesc(wlist_angles_mat);
+colorbar();
+title('angle b/w W and probe');
+subplot(2,2,3);
+imagesc(jab_angles_mat);
+colorbar();
+title('angle b/w J and probe');
+subplot(2,2,4);
+imagesc(non_angles_mat);
+colorbar();
+title('angle b/w N and probe');
 
 % %% create_figure function: create figures with any combo of 2 conditions
 % %sentence to wlist comparison
