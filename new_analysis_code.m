@@ -156,18 +156,18 @@ non_word_tensor_all=non_word_tensor_all.*scale_matrix;
 scale_matrix=repmat(info.valid_channels,1,5);
 non_probe_tensor_all=non_probe_tensor_all.*scale_matrix;
 
-%% Rearrange tensors so all frequencies are next to each other
-%Not necessary if extract_condition_response works as expected
-new_order=[];
-for i=1:5
-    temp=i:5:35+i;
-    new_order=[new_order,temp];
-end
+%%% Rearrange tensors so all frequencies are next to each other
+%%Only use if x.combined_signal_gaus_zs_parsed is used in extract_condition_response
+%new_order=[];
+%for i=1:5
+%    temp=i:5:35+i;
+%    new_order=[new_order,temp];
+%end
 
-sent_word_tensor_all=sent_word_tensor_all(:,new_order,:);
-wlist_word_tensor_all=wlist_word_tensor_all(:,new_order,:);
-jab_word_tensor_all=jab_word_tensor_all(:,new_order,:);
-non_word_tensor_all=non_word_tensor_all(:,new_order,:);
+%sent_word_tensor_all=sent_word_tensor_all(:,new_order,:);
+%wlist_word_tensor_all=wlist_word_tensor_all(:,new_order,:);
+%jab_word_tensor_all=jab_word_tensor_all(:,new_order,:);
+%non_word_tensor_all=non_word_tensor_all(:,new_order,:);
 
 
 %% Separate tensors by frequency
