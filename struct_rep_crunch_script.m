@@ -1,7 +1,7 @@
 %% extract dat files 
-clear all 
-close all 
-home
+clear all;
+close all;
+home;
 %% 
 if 1
     fprintf('adding evlab ecog tools to path \n');
@@ -9,9 +9,17 @@ if 1
     addpath(genpath('~/MyCodes/evlab_ecog_tools/'));
 end 
 %%
-subject_name='AMC026';
-experiment_name ='SWJN';
-
+%% 
+% subject_name='AMC044';
+% experiment_name ='SWJN';
+% subj_op_info=AMC044_ECOGS001R01.info.subj_op_info;
+% subj_op_info.analyzed_by_user=1;
+% subj_op_info.analyzed_by_username='ehoseini';
+% eval(strcat(subject_name,'_op_info=subj_op_info')) 
+% save(sprintf('%s_operation_info.mat',subject_name),sprintf('%s_op_info',subject_name),'-v7.3');
+%% 
+ subject_name='AMC038';
+ experiment_name ='SWJN';
 data_path='~/MyData/ecog-sentence/subjects_raw/';
 save_path='~/MyData/struct_rep/crunched/';
 sub_info_path='~/MyData/struct_rep/sub_operation_info/';
@@ -23,17 +31,18 @@ d_subj_op_info=dir(strcat(sub_info_path,'/',subject_name,'_operation_info.mat'))
 d_info=arrayfun(@(x) {strcat(d_subj_op_info(x).folder,'/',d_subj_op_info(x).name)}, 1:length(d_subj_op_info));
 
 
-subject_op_info=load(d_info{1},sprintf('%s_op',subject_name));
-if ~ subject_op_info.(sprintf('%s_op',subject_name)).op_info.analyzed_by_user
+subject_op_info=load(d_info{1},sprintf('%s_op_info',subject_name));
+if ~ subject_op_info.(sprintf('
+    %s_op_info',subject_name)).analyzed_by_user
     subject_op_info=subject_op_info.(strcat(subject_name,'_op'));
     subject_op_info=find_noise_free_electrodes(d_files,subject_op_info);
 end 
 
 %%
-for i=9:length(d_files)
+for i=1:length(d_files)
     fprintf('extracting %s \n',d_files{i});
-    subject_op_info=load(d_info{1},sprintf('%s_op',subject_name));
-    subject_op_info=subject_op_info.(strcat(subject_name,'_op')).op_info;
+    subject_op_info=load(d_info{1},sprintf('%s_op_info',subject_name));
+    subject_op_info=subject_op_info.(strcat(subject_name,'_op_info'));
     
     output=filter_channels_using_gaussian('datafile',d_files{i},'op_info',subject_op_info);
     subject_name=d(i).folder(strfind(d(i).folder,'AMC')+[0:5]);
@@ -45,6 +54,7 @@ for i=9:length(d_files)
     % step 1: find start and end of trials 
     info.sample_rate=output.parameters.SamplingRate.NumericValue;
     info.downsample_sampling_rate=output.samplingrate;
+    info.gaus_filt_defs=output.gaus_filt_defs;
     % 
     info.pre_trial_samples=info.sample_rate*pre_trial_time;
     info.pre_trial_samples_downsample=info.downsample_sampling_rate*pre_trial_time;
@@ -262,14 +272,13 @@ for i=9:length(d_files)
     eval(strcat(subject_name,'_',session_name,'.info=info'));
     %save(strcat(d(i).folder,'/',d(i).name),'data','info','-v7.3');
     save(strcat(save_path,subject_name,'_',experiment_name,'_',session_name,'_crunched_v3.mat'),strcat(subject_name,'_',session_name),'-v7.3');
-    clear ouput;
-    eval(['clear',' ',subject_name,'_',session_name]);
+    clearvars -except d_files i subject_name d_info d experiment_name data_path save_path sub_info_path
 end
 
 %% create a compressed version of the dataset 
 clear all 
 close all 
-subject_id='AMC026';
+subject_id='AMC038';
 experiment_name ='SWJN';
 
 if ispc
