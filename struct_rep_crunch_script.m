@@ -18,7 +18,7 @@ end
 % eval(strcat(subject_name,'_op_info=subj_op_info')) 
 % save(sprintf('%s_operation_info.mat',subject_name),sprintf('%s_op_info',subject_name),'-v7.3');
 %% 
- subject_name='AMC038';
+ subject_name='AMC044';
  experiment_name ='SWJN';
 data_path='~/MyData/ecog-sentence/subjects_raw/';
 save_path='~/MyData/struct_rep/crunched/';
@@ -32,8 +32,7 @@ d_info=arrayfun(@(x) {strcat(d_subj_op_info(x).folder,'/',d_subj_op_info(x).name
 
 
 subject_op_info=load(d_info{1},sprintf('%s_op_info',subject_name));
-if ~ subject_op_info.(sprintf('
-    %s_op_info',subject_name)).analyzed_by_user
+if ~ subject_op_info.(sprintf('%s_op_info',subject_name)).analyzed_by_user
     subject_op_info=subject_op_info.(strcat(subject_name,'_op'));
     subject_op_info=find_noise_free_electrodes(d_files,subject_op_info);
 end 
@@ -275,10 +274,10 @@ for i=1:length(d_files)
     clearvars -except d_files i subject_name d_info d experiment_name data_path save_path sub_info_path
 end
 
-%% create a compressed version of the dataset 
+%% create a compressed version of the dataset
 clear all 
 close all 
-subject_id='AMC038';
+subject_id='AMC044';
 experiment_name ='SWJN';
 
 if ispc
@@ -295,7 +294,7 @@ else
     d_data=arrayfun(@(x) strcat(d_data(x).folder,'/',d_data(x).name),[1:length(d_data)]','uni',false); %change '/'
 end 
 fprintf(' %d .mat files were found \n', length(d_data));
-
+%
 for k=1:length(d_data)
     subj=load(d_data{k});
     subj_id=fieldnames(subj);
@@ -315,14 +314,26 @@ for k=1:length(d_data)
         for t=non_signal_fields',trial_1.(trial_fields{t})=trial.(trial_fields{t});end 
         % add the signal ave stuff
         signal_ave_fields=find(contains(trial_fields,'signal_ave'));
-        for t=signal_ave_fields',trial_1.(trial_fields{t})=trial.(trial_fields{t});end;
+        for t=signal_ave_fields',trial_1.(trial_fields{t})=trial.(trial_fields{t});end
         % add the signal stuff,
         signal_fields=find(contains(trial_fields,'signal'));
         signal_fields=setdiff(signal_fields,signal_ave_fields);
         % do averaging for signal in cells 
         signal_cell_fields=intersect(cell_fields,signal_fields);
-        for t=signal_cell_fields',trial_1.(trial_fields{t})=cellfun(@(x) mean(x,2),trial.(trial_fields{t}),'uni',false);end 
+        % get trial_timewidth
+        word_loc=contains(trial.stimuli_type,'word');
+        for t=signal_cell_fields'
+            stim_time=cellfun(@(x) size(x,2),trial.(trial_fields{t}));
+            word_time=unique(stim_time(word_loc));
+            trial_signal=trial.(trial_fields{t});
+            trial_signal_for_ave=cellfun(@(x) x(:,1:min([size(x,2),word_time])),trial_signal,'uni',false);
+            if word_loc
+                assert(unique(max(cell2mat(cellfun(@(x) size(x,2),trial_signal_for_ave,'uni',false))))==word_time,'averaging window is incorrect');
+            end 
+            trial_1.(trial_fields{t})=cellfun(@(x) mean(x,2),trial_signal_for_ave,'uni',false);
+        end 
         % do averaging for signal in non cells 
+        trial_1.ave_window_time=word_time;
         data_1{kk,1}=trial_1;
     end
     

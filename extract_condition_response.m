@@ -1,6 +1,6 @@
 function data_out=extract_condition_response(data,info,cond,stim)
     trial_type=info.word_type;
-    cond_id=find(cellfun(@(x) x==cond,trial_type));
+    cond_id=find(contains(trial_type,cond));
     data_cond=data(cond_id); %array of trials with only desired condition
     stim_loc=cellfun(@(x) find(strcmp(x.stimuli_type,stim)), data_cond,'uni',false);
     %old files -> x.signal_ave_hilbert_zs_downsample_parsed
