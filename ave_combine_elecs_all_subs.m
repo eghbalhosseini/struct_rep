@@ -1,6 +1,6 @@
 close all
 home 
-data_path='C:\Users\kirsi\Documents\Git\UROP\struct_rep\data\compressed_data'; 
+data_path='C:\Users\kirsi\Desktop\struct_rep\data\ave_window_time'; 
 subject_id={'AMC026','AMC029','AMC031','AMC037','AMC038','AMC044'};
 combine_elecs_all_sent_word=[];
 combine_elecs_all_wlist_word=[];
@@ -119,12 +119,6 @@ for m=1:length(subject_id)
     non_change_indices=find(ismember(non_changes,1));
     non_change_indices=non_change_indices+1;
     
-    % If length(change) < 8, add indices until length=8
-    sent_change_indices=add_indices(sent_word_combined_elecs,sent_change_indices);
-    wlist_change_indices=add_indices(wlist_word_combined_elecs,wlist_change_indices);
-    jab_change_indices=add_indices(jab_word_combined_elecs,jab_change_indices);
-    non_change_indices=add_indices(non_word_combined_elecs,non_change_indices);
-    
     %Take average of trials at each probe position
     sent_word_combined_elecs=probe_pos_ave_trials(sent_change_indices, sent_word_combined_elecs);
     sent_probe_combined_elecs=probe_pos_ave_trials(sent_change_indices, sent_probe_combined_elecs); 
@@ -165,6 +159,17 @@ for m=1:length(subject_id)
 %     wlist_probe_combined_elecs=wlist_probe_combined_elecs.*info.sig_and_pos_chans_combine_elecs;
 %     jab_probe_combined_elecs=jab_probe_combined_elecs.*info.sig_and_pos_chans_combine_elecs;
 %     non_probe_combined_elecs=non_probe_combined_elecs.*info.sig_and_pos_chans_combine_elecs;
+
+    %% Make sure tensors are proper dimension
+    sent_word_combined_elecs=add_dims_nan(sent_word_combined_elecs);
+    wlist_word_combined_elecs=add_dims_nan(wlist_word_combined_elecs);
+    jab_word_combined_elecs=add_dims_nan(jab_word_combined_elecs);
+    non_word_combined_elecs=add_dims_nan(non_word_combined_elecs);
+    
+    sent_probe_combined_elecs=add_dims_nan(sent_probe_combined_elecs);
+    wlist_probe_combined_elecs=add_dims_nan(wlist_probe_combined_elecs);
+    jab_probe_combined_elecs=add_dims_nan(jab_probe_combined_elecs);
+    non_probe_combined_elecs=add_dims_nan(non_probe_combined_elecs);
     
     %% Combine averaged tensors from all subjects along dim1
     combine_elecs_all_sent_word=cat(1,combine_elecs_all_sent_word, sent_word_combined_elecs);
