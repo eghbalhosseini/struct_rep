@@ -102,10 +102,14 @@ for m=1:length(subject_id)
     non_probe_combined_elecs=non_probe_combined_elecs.*info.sig_and_pos_chans_combine_elecs;
 
 %     %% Only use valid channels
-%     scale_matrix=zeros(5*length(info.valid_channels),1);
-%     for i=1:length(info.valid_channels)
-%         temp=repmat(info.valid_channels(i),5,1);
-%         scale_matrix(i+4*(i-1):5*i)=temp;
+%     if size(sent_word_combined_elecs,1)>length(info.valid_channels)
+%         scale_matrix=zeros(5*length(info.valid_channels),1);
+%         for i=1:length(info.valid_channels)
+%             temp=repmat(info.valid_channels(i),5,1);
+%             scale_matrix(i+4*(i-1):5*i)=temp;
+%         end
+%     else
+%         scale_matrix=info.valid_channels;
 %     end
 % 
 %     sent_word_combined_elecs=sent_word_combined_elecs.*repmat(scale_matrix,1,8);
