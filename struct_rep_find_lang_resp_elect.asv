@@ -18,14 +18,14 @@ for m=1:length(subject_id)
         % sentences 
         cond='S';
         stim='word';
-        data_out=extract_condition_response(data,info,cond,stim,false,true);
+        data_out=extract_condition_response(data,info,cond,stim,false,false);
         % take the mean across the words 
         hilb_ave_cond_contrast_vec=[hilb_ave_cond_contrast_vec,squeeze(nanmean(data_out,2))];
         cond_contrast_vec=[cond_contrast_vec,1+0*squeeze(nanmean(data_out,2))];
         %nonword
         cond='N';
         stim='word';
-        data_out=extract_condition_response(data,info,cond,stim,false,true);
+        data_out=extract_condition_response(data,info,cond,stim,false,false);
         hilb_ave_cond_contrast_vec=[hilb_ave_cond_contrast_vec,squeeze(nanmean(data_out,2))];
         cond_contrast_vec=[cond_contrast_vec,-1+0*squeeze(nanmean(data_out,2))];
         fprintf('added %s \n', d_data{k});
