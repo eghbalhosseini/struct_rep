@@ -1,6 +1,6 @@
 close all
 home 
-data_path='C:\Users\kirsi\Desktop\struct_rep\data\ave_window_time'; 
+data_path='C:\Users\kirsi\Documents\data\ave_window_time'; 
 subject_id={'AMC026','AMC029','AMC031','AMC037','AMC038','AMC044'};
 combine_elecs_all_sent_word=[];
 combine_elecs_all_wlist_word=[];
@@ -32,28 +32,28 @@ for m=1:length(subject_id)
         data=subj.data;
         info=subj.info;
 
-        data_out_all=extract_condition_response(data,info,'S','word',true,true);
+        data_out_all=extract_condition_response(data,info,'S','word',false,false);
         sent_word_combined_elecs=cat(3,sent_word_combined_elecs,data_out_all);
 
-        data_out_all=extract_condition_response(data,info,'S','probe',true,true);
+        data_out_all=extract_condition_response(data,info,'S','pretrial',false,false);
         sent_probe_combined_elecs=cat(3,sent_probe_combined_elecs,data_out_all);
 
-        data_out_all=extract_condition_response(data,info,'W','word',true,true);
+        data_out_all=extract_condition_response(data,info,'W','word',false,false);
         wlist_word_combined_elecs=cat(3,wlist_word_combined_elecs,data_out_all);
 
-        data_out_all=extract_condition_response(data,info,'W','probe',true,true);
+        data_out_all=extract_condition_response(data,info,'W','pretrial',false,false);
         wlist_probe_combined_elecs=cat(3,wlist_probe_combined_elecs,data_out_all);
 
-        data_out_all=extract_condition_response(data,info,'J','word',true,true);
+        data_out_all=extract_condition_response(data,info,'J','word',false,false);
         jab_word_combined_elecs=cat(3,jab_word_combined_elecs,data_out_all);
 
-        data_out_all=extract_condition_response(data,info,'J','probe',true,true);
+        data_out_all=extract_condition_response(data,info,'J','pretrial',false,false);
         jab_probe_combined_elecs=cat(3,jab_probe_combined_elecs,data_out_all);
 
-        data_out_all=extract_condition_response(data,info,'N','word',true,true);
+        data_out_all=extract_condition_response(data,info,'N','word',false,false);
         non_word_combined_elecs=cat(3,non_word_combined_elecs,data_out_all);
 
-        data_out_all=extract_condition_response(data,info,'N','probe',true,true);
+        data_out_all=extract_condition_response(data,info,'N','pretrial',false,false);
         non_probe_combined_elecs=cat(3,non_probe_combined_elecs,data_out_all);
     end
     
@@ -71,16 +71,16 @@ for m=1:length(subject_id)
         data=subj.data;
         info=subj.info;
 
-        temp_sent_pos=get_positions(info,data,'S',true);
+        temp_sent_pos=get_positions(info,data,'S',false);
         sent_positions=cat(1, sent_positions, temp_sent_pos);
 
-        temp_wlist_pos=get_positions(info,data,'W',true);
+        temp_wlist_pos=get_positions(info,data,'W',false);
         wlist_positions=cat(1, wlist_positions, temp_wlist_pos);
 
-        temp_jab_pos=get_positions(info,data,'J',true);
+        temp_jab_pos=get_positions(info,data,'J',false);
         jab_positions=cat(1, jab_positions, temp_jab_pos);
 
-        temp_non_pos=get_positions(info,data,'N',true);
+        temp_non_pos=get_positions(info,data,'N',false);
         non_positions=cat(1, non_positions, temp_non_pos);
     end
 
@@ -133,21 +133,15 @@ for m=1:length(subject_id)
     non_probe_combined_elecs=probe_pos_ave_trials(non_change_indices, non_probe_combined_elecs);
     
     %% Only use valid channels
-    scale_matrix=zeros(5*length(info.valid_channels),1);
-    for i=1:length(info.valid_channels)
-        temp=repmat(info.valid_channels(i),5,1);
-        scale_matrix(i+4*(i-1):5*i)=temp;
-    end
+    sent_word_combined_elecs=sent_word_combined_elecs.*repmat(info.valid_channels,1,8);
+    wlist_word_combined_elecs=wlist_word_combined_elecs.*repmat(info.valid_channels,1,8);
+    jab_word_combined_elecs=jab_word_combined_elecs.*repmat(info.valid_channels,1,8);
+    non_word_combined_elecs=non_word_combined_elecs.*repmat(info.valid_channels,1,8);
 
-    sent_word_combined_elecs=sent_word_combined_elecs.*repmat(scale_matrix,1,8);
-    wlist_word_combined_elecs=wlist_word_combined_elecs.*repmat(scale_matrix,1,8);
-    jab_word_combined_elecs=jab_word_combined_elecs.*repmat(scale_matrix,1,8);
-    non_word_combined_elecs=non_word_combined_elecs.*repmat(scale_matrix,1,8);
-
-    sent_probe_combined_elecs=sent_probe_combined_elecs.*scale_matrix;
-    wlist_probe_combined_elecs=wlist_probe_combined_elecs.*scale_matrix;
-    jab_probe_combined_elecs=jab_probe_combined_elecs.*scale_matrix;
-    non_probe_combined_elecs=non_probe_combined_elecs.*scale_matrix;
+    sent_probe_combined_elecs=sent_probe_combined_elecs.*info.valid_channels;
+    wlist_probe_combined_elecs=wlist_probe_combined_elecs.*info.valid_channels;
+    jab_probe_combined_elecs=jab_probe_combined_elecs.*info.valid_channels;
+    non_probe_combined_elecs=non_probe_combined_elecs.*info.valid_channels;
     
 %     %% Only use lang responsive channels
 %     sent_word_combined_elecs=sent_word_combined_elecs.*repmat(info.sig_and_pos_chans_combine_elecs,1,8);
