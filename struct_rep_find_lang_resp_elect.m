@@ -1,8 +1,8 @@
 num_of_permutation=1000; 
 p_threshold=0.01;
 %% specify where the data is
-subject_id={'AMC026','AMC029','AMC031','AMC037','AMC038'}
-data_path='C:\Users\kirsi\Documents\Git\UROP\struct_rep\data\ave_window_time'; 
+subject_id={'AMC026','AMC029','AMC031','AMC037','AMC038','AMC044'}
+data_path='C:\Users\kirsi\Documents\data\ave_window_time'; 
 for m=1:length(subject_id)
     d_data= dir(strcat(data_path,'\',subject_id{1,m},'*_crunched_v3_compressed.mat')); 
     d_data=arrayfun(@(x) strcat(d_data(x).folder,'\',d_data(x).name),[1:length(d_data)]','uni',false);
@@ -18,14 +18,14 @@ for m=1:length(subject_id)
         % sentences 
         cond='S';
         stim='word';
-        data_out=extract_condition_response(data,info,cond,stim,false,true);
+        data_out=extract_condition_response(data,info,cond,stim,false,false);
         % take the mean across the words 
         hilb_ave_cond_contrast_vec=[hilb_ave_cond_contrast_vec,squeeze(nanmean(data_out,2))];
         cond_contrast_vec=[cond_contrast_vec,1+0*squeeze(nanmean(data_out,2))];
         %nonword
         cond='N';
         stim='word';
-        data_out=extract_condition_response(data,info,cond,stim,false,true);
+        data_out=extract_condition_response(data,info,cond,stim,false,false);
         hilb_ave_cond_contrast_vec=[hilb_ave_cond_contrast_vec,squeeze(nanmean(data_out,2))];
         cond_contrast_vec=[cond_contrast_vec,-1+0*squeeze(nanmean(data_out,2))];
         fprintf('added %s \n', d_data{k});
@@ -48,15 +48,10 @@ for m=1:length(subject_id)
     if size(info.valid_channels,1)<size(info.valid_channels,2)
         info.valid_channels=transpose(info.valid_channels);
     end 
-    scale_matrix=zeros(5*length(info.valid_channels),1);
-    for i=1:length(info.valid_channels)
-        temp=repmat(info.valid_channels(i),5,1);
-        scale_matrix(i+4*(i-1):5*i)=temp;
-    end
     p_fraction=sum(rho_hilbert_permuted>repmat(rho_hilbert_original,[1,num_of_permutation]),2)./size(rho_hilbert_permuted,2);
     p_significant=p_fraction<p_threshold;
-    ch_significant_and_positive=p_significant.*rho_hilbert_positive.*scale_matrix;
-    ch_significant=p_significant.*scale_matrix;
+    ch_significant_and_positive=p_significant.*rho_hilbert_positive.*info.valid_channels;
+    ch_significant=p_significant.*info.valid_channels;
 
     fprintf('\n hilbert language electrodes:[');
     fprintf('%d, ',find(ch_significant_and_positive)' );
@@ -68,8 +63,8 @@ for m=1:length(subject_id)
         subj=subj.(subj_id{1});
         data=subj.data;
         info=subj.info;
-        info.sig_chans_combine_elecs=ch_significant;
-        info.sig_and_pos_chans_combine_elecs=ch_significant_and_positive;
+        info.sig_chans_single_freq=ch_significant;
+        info.sig_and_pos_chans_single_freq=ch_significant_and_positive;
         if size(info.valid_channels,1)<size(info.valid_channels,2)
             info.valid_channels=transpose(info.valid_channels);
         end 
@@ -185,5 +180,6 @@ for m=1:length(subject_id)
 %         fprintf('added back language electrodes to %s \n', d_data{k});
 %     end 
 %     fprintf('one particpant done \n')
+    fprintf('finished one participant \n')
 end
     
