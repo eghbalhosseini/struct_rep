@@ -15,7 +15,7 @@ else
     % eghbal's computer 
     data_path='~/MyData/struct_rep/crunched/';
     analysis_path=strcat(data_path,'analysis/distributed_oscilatory_power/');
-    d_data= dir(strcat(data_path,'/',subject_id,'*_crunched_v2.mat')); 
+    d_data= dir(strcat(data_path,'/',subject_id,'*_crunched_v3.mat')); 
     d_data=arrayfun(@(x) strcat(d_data(x).folder,'/',d_data(x).name),[1:length(d_data)]','uni',false); %change '/'
 end 
 fprintf(' %d .mat files were found \n', length(d_data));

@@ -8,17 +8,8 @@ if 1
     addpath('~/MyCodes/evlab_ecog_tools/');
     addpath(genpath('~/MyCodes/evlab_ecog_tools/'));
 end 
-%%
 %% 
-% subject_name='AMC044';
-% experiment_name ='SWJN';
-% subj_op_info=AMC044_ECOGS001R01.info.subj_op_info;
-% subj_op_info.analyzed_by_user=1;
-% subj_op_info.analyzed_by_username='ehoseini';
-% eval(strcat(subject_name,'_op_info=subj_op_info')) 
-% save(sprintf('%s_operation_info.mat',subject_name),sprintf('%s_op_info',subject_name),'-v7.3');
-%% 
- subject_name='AMC044';
+ subject_name='AMC026';
  experiment_name ='SWJN';
 data_path='~/MyData/ecog-sentence/subjects_raw/';
 save_path='~/MyData/struct_rep/crunched/';
@@ -31,8 +22,9 @@ d_subj_op_info=dir(strcat(sub_info_path,'/',subject_name,'_operation_info.mat'))
 d_info=arrayfun(@(x) {strcat(d_subj_op_info(x).folder,'/',d_subj_op_info(x).name)}, 1:length(d_subj_op_info));
 
 
-subject_op_info=load(d_info{1},sprintf('%s_op_info',subject_name));
-if ~ subject_op_info.(sprintf('%s_op_info',subject_name)).analyzed_by_user
+subject_op_info=load(d_info{1},sprintf('%s_op',subject_name));
+try subject_op_info=subject_op_info.(sprintf('%s_op',subject_name)).op_info; end 
+if ~ subject_op_info.analyzed_by_user
     subject_op_info=subject_op_info.(strcat(subject_name,'_op'));
     subject_op_info=find_noise_free_electrodes(d_files,subject_op_info);
 end 
@@ -40,8 +32,8 @@ end
 %%
 for i=1:length(d_files)
     fprintf('extracting %s \n',d_files{i});
-    subject_op_info=load(d_info{1},sprintf('%s_op_info',subject_name));
-    subject_op_info=subject_op_info.(strcat(subject_name,'_op_info'));
+    subject_op_info=load(d_info{1},sprintf('%s_op',subject_name));
+    try subject_op_info=subject_op_info.(sprintf('%s_op',subject_name)).op_info; end 
     
     output=filter_channels_using_gaussian('datafile',d_files{i},'op_info',subject_op_info);
     subject_name=d(i).folder(strfind(d(i).folder,'AMC')+[0:5]);
@@ -52,7 +44,7 @@ for i=1:length(d_files)
     pre_trial_time=0.4; % in sec 
     % step 1: find start and end of trials 
     info.sample_rate=output.parameters.SamplingRate.NumericValue;
-    info.downsample_sampling_rate=output.samplingrate;
+    info.downsample_sampling_rate=output.downsamplingrate;
     info.gaus_filt_defs=output.gaus_filt_defs;
     % 
     info.pre_trial_samples=info.sample_rate*pre_trial_time;
@@ -260,8 +252,8 @@ for i=1:length(d_files)
     info.unselected_channels=output.op_info.unselected_channels;
     info.selected_channels=output.op_info.clean_channels;
     % 
-    info.downsample_sampling_rate=output.samplingrate;
-    info.broadband_defs=output.samplingrate;
+    info.downsample_sampling_rate=output.downsamplingrate;
+    info.broadband_defs=output.gaus_filt_defs;
     valid_channels=zeros(size(subject_op_info.transmit_chan));
     valid_channels(subject_op_info.clean_channels)=1;
     info.valid_channels=valid_channels;
