@@ -28,9 +28,6 @@ function data_out=extract_condition_response(data,info,cond,stim,correct_respons
     if stim(1:4)=='pret'
         hilb_zs_ave_cell=cellfun(@(x) x.signal_ave_pre_trial_hilbert_zs_downsample, data_cond,'uni',false);
         stim_zs_ave_cell=arrayfun(@(x) hilb_zs_ave_cell{x},[1:size(hilb_zs_ave_cell,1)],'uni',false );
-        % reshape stim to correct form if it is not
-        % stim_zs_ave_cell2=cellfun(@(x) cell2mat(reshape(x,1,[])),stim_zs_ave_cell,'uni',false );
-        % tensor format (elec*stim(words)*trial)
         stim_zs_ave_tensor=double(cell2mat(permute(stim_zs_ave_cell,[1,3,2])));
         data_out=stim_zs_ave_tensor;  
     else
