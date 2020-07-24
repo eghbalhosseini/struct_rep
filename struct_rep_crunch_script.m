@@ -9,7 +9,7 @@ if 1
     addpath(genpath('~/MyCodes/evlab_ecog_tools/'));
 end 
 %% 
- subject_name='AMC026';
+ subject_name='AMC038';
  experiment_name ='SWJN';
 data_path='~/MyData/ecog-sentence/subjects_raw/';
 save_path='~/MyData/struct_rep/crunched/';
@@ -21,9 +21,8 @@ fprintf(' %d .dat files were found \n', length(d))
 d_subj_op_info=dir(strcat(sub_info_path,'/',subject_name,'_operation_info.mat'));
 d_info=arrayfun(@(x) {strcat(d_subj_op_info(x).folder,'/',d_subj_op_info(x).name)}, 1:length(d_subj_op_info));
 
-
-subject_op_info=load(d_info{1},sprintf('%s_op',subject_name));
-try subject_op_info=subject_op_info.(sprintf('%s_op',subject_name)).op_info; end 
+subject_op_info=load(d_info{1},sprintf('%s_op_info',subject_name));
+try subject_op_info=subject_op_info.(sprintf('%s_op_info',subject_name)); end 
 if ~ subject_op_info.analyzed_by_user
     subject_op_info=subject_op_info.(strcat(subject_name,'_op'));
     subject_op_info=find_noise_free_electrodes(d_files,subject_op_info);
@@ -32,8 +31,8 @@ end
 %%
 for i=1:length(d_files)
     fprintf('extracting %s \n',d_files{i});
-    subject_op_info=load(d_info{1},sprintf('%s_op',subject_name));
-    try subject_op_info=subject_op_info.(sprintf('%s_op',subject_name)).op_info; end 
+    subject_op_info=load(d_info{1},sprintf('%s_op_info',subject_name));
+    try subject_op_info=subject_op_info.(sprintf('%s_op_info',subject_name)); end 
     
     output=filter_channels_using_gaussian('datafile',d_files{i},'op_info',subject_op_info);
     subject_name=d(i).folder(strfind(d(i).folder,'AMC')+[0:5]);
@@ -41,7 +40,7 @@ for i=1:length(d_files)
     % start with an empty strcuture for data and info 
     dat={};
     info=struct;
-    pre_trial_time=0.4; % in sec 
+    pre_trial_time=0.45; % in sec 
     % step 1: find start and end of trials 
     info.sample_rate=output.parameters.SamplingRate.NumericValue;
     info.downsample_sampling_rate=output.downsamplingrate;
@@ -160,10 +159,14 @@ for i=1:length(d_files)
         end 
         % add pre trial samples 
         %trial.signal_pre_trial_broadband=signal_broadband(:,stimuli_range(1)+[-info.pre_trial_samples:-1]);
-        trial.(strcat('signal','_pre_trial','_hilbert_downsample'))=signal_hilbert_downsample(:,stimuli_downsample_range(1)+[-info.pre_trial_samples_downsample:-1]);
-        trial.(strcat('signal','_pre_trial','_hilbert_zs_downsample'))=signal_hilbert_zs_downsample(:,stimuli_downsample_range(1)+[-info.pre_trial_samples_downsample:-1]);
-        trial.(strcat('signal_ave','_pre_trial','_hilbert_downsample'))=nanmean(signal_hilbert_downsample(:,stimuli_downsample_range(1)+[-info.pre_trial_samples_downsample:-1]),2);
-        trial.(strcat('signal_ave','_pre_trial','_hilbert_zs_downsample'))=nanmean(signal_hilbert_zs_downsample(:,stimuli_downsample_range(1)+[-info.pre_trial_samples_downsample:-1]),2);
+        pre_trial_idx=stimuli_downsample_range(1)+[-info.pre_trial_samples_downsample:-1];
+        trial.(strcat('signal','_pre_trial','_hilbert_downsample'))=signal_hilbert_downsample(:,pre_trial_idx);
+        trial.(strcat('signal','_pre_trial','_hilbert_zs_downsample'))=signal_hilbert_zs_downsample(:,pre_trial_idx);
+        trial.(strcat('signal_ave','_pre_trial','_hilbert_downsample'))=nanmean(signal_hilbert_downsample(:,pre_trial_idx),2);
+        trial.(strcat('signal_ave','_pre_trial','_hilbert_zs_downsample'))=nanmean(signal_hilbert_zs_downsample(:,pre_trial_idx),2);
+        trial.(strcat('signal','_pre_trial','_gaus_band_hilb_dec'))=arrayfun(@(x) transpose(output.signal_gaus_bands(x).hilbert_dec(pre_trial_idx,:)),1:size(output.signal_gaus_bands,2),'uni',false);
+        trial.(strcat('signal','_pre_trial','_gaus_band_hilb_dec_zs'))=arrayfun(@(x) transpose(output.signal_gaus_bands(x).hilbert_dec_zs(pre_trial_idx,:)),1:size(output.signal_gaus_bands,2),'uni',false);
+        trial.(strcat('signal','_pre_trial','_broadband_hilb_dec'))=cellfun(@(x) x(:,pre_trial_idx),output.signal_broad_bands.hilbert_dec,'uni',false)';
         % 
         
         trial.(strcat('signal','_hilbert_downsample_parsed'))=signal_hilbert_downsample_parsed;
@@ -269,7 +272,7 @@ end
 %% create a compressed version of the dataset
 clear all 
 close all 
-subject_id='AMC044';
+subject_id='AMC038';
 experiment_name ='SWJN';
 
 if ispc
@@ -307,9 +310,19 @@ for k=1:length(d_data)
         % add the signal ave stuff
         signal_ave_fields=find(contains(trial_fields,'signal_ave'));
         for t=signal_ave_fields',trial_1.(trial_fields{t})=trial.(trial_fields{t});end
+        % signal pre trial stuff 
+        signal_pre_fields=find(contains(trial_fields,'signal_pre'));
+        for t=signal_pre_fields'
+            if iscell(trial.(trial_fields{t}))
+                trial_1.(trial_fields{t})=cellfun(@(x) mean(x,2),trial.(trial_fields{t}),'uni',false);
+            else 
+                trial_1.(trial_fields{t})=nanmean(trial.(trial_fields{t}),2);
+            end 
+        end 
         % add the signal stuff,
         signal_fields=find(contains(trial_fields,'signal'));
         signal_fields=setdiff(signal_fields,signal_ave_fields);
+        signal_fields=setdiff(signal_fields,signal_pre_fields);
         % do averaging for signal in cells 
         signal_cell_fields=intersect(cell_fields,signal_fields);
         % get trial_timewidth
