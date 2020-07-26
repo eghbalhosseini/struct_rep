@@ -1,7 +1,5 @@
-data_path='C:\Users\kirsi\Documents\Git\UROP\struct_rep\data\ave_window_time';
-subject_id={'AMC026','AMC029','AMC031','AMC037','AMC038'};
-num_of_permutation=1000; 
-p_threshold=0.01;
+data_path='C:\Users\kirsi\Documents\data\updated_files';
+subject_id={'AMC026','AMC029','AMC031','AMC037','AMC038','AMC044'};
 for m=1:length(subject_id)
     d_data= dir(strcat(data_path,'\',subject_id{1,m},'*_crunched_v3_compressed.mat'));
     fprintf(' %d .mat files were found \n', length(d_data));
@@ -35,12 +33,6 @@ for m=1:length(subject_id)
             end
             data{j,1}.combined_signal_gaus_zs_parsed=freqs_all_cell;
             data{j,1}.combined_electrodes=elec_cell;
-%             subject_name=info.subject;
-%             session_name=info.session_name;
-%             eval(strcat(subject_name,'_',session_name,'.data=data;'));
-%             eval(strcat(subject_name,'_',session_name,'.info=info;'));
-%             save(d_data{k},strcat(subject_name,'_',session_name),'-v7.3');
-%             
             if isempty(data{j,1}.trial_string) %fixation trial
                 position_matrix=cat(1, position_matrix, -1);
             else

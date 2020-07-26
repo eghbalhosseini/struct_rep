@@ -1,6 +1,6 @@
 close all
 home 
-data_path={'C:\Users\kirsi\Documents\data\compressed_data','C:\Users\kirsi\Documents\data\ave_window_time'}; 
+data_path={'C:\Users\kirsi\Documents\data\updated_files'}; 
 subject_id='AMC026';
 for m=1:length(data_path)
     d_data= dir(strcat(data_path{1,m},'\',subject_id,'*_crunched_v3_compressed.mat')); 
