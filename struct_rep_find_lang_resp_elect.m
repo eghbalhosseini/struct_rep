@@ -5,9 +5,9 @@ num_of_permutation=1000;
 p_threshold=0.01;
 %% specify where the data is
 subject_id={'AMC026','AMC029','AMC031','AMC037','AMC038','AMC044'};
-data_path='C:\Users\kirsi\Documents\data\updated_files';
+data_path='C:\Users\kirsi\Documents\data';
 for m=1:length(subject_id)
-    d_data= dir(strcat(data_path,'\',subject_id{1,m},'*_crunched_v3_compressed.mat'));
+    d_data= dir(strcat(data_path,'\',subject_id{1,m},'*_crunched_v3.mat'));
     d_data=arrayfun(@(x) strcat(d_data(x).folder,'\',d_data(x).name),[1:length(d_data)]','uni',false);
     fprintf('%d .mat files were found \n',length(d_data))
     hilb_ave_cond_contrast_vec=[];
@@ -21,14 +21,14 @@ for m=1:length(subject_id)
         % sentences
         cond='S';
         stim='word';
-        data_out=extract_condition_response(data,info,cond,stim,false,false);
+        data_out=extract_condition_response(data,info,cond,stim,false,true);
         % take the mean across the words
         hilb_ave_cond_contrast_vec=[hilb_ave_cond_contrast_vec,squeeze(nanmean(data_out,2))];
         cond_contrast_vec=[cond_contrast_vec,1+0*squeeze(nanmean(data_out,2))];
         %nonword
         cond='N';
         stim='word';
-        data_out=extract_condition_response(data,info,cond,stim,false,false);
+        data_out=extract_condition_response(data,info,cond,stim,false,true);
         hilb_ave_cond_contrast_vec=[hilb_ave_cond_contrast_vec,squeeze(nanmean(data_out,2))];
         cond_contrast_vec=[cond_contrast_vec,-1+0*squeeze(nanmean(data_out,2))];
         fprintf('added %s \n', d_data{k});

@@ -4,8 +4,7 @@ for m=1:length(subject_id)
     d_data= dir(strcat(data_path,'\',subject_id{1,m},'*_crunched_v3.mat'));
     fprintf(' %d .mat files were found \n', length(d_data));
     d_data=arrayfun(@(x) strcat(d_data(x).folder,'\',d_data(x).name),[1:length(d_data)]','uni',false);
-    hilb_ave_cond_contrast_vec=[];
-    cond_contrast_vec=[];
+
     for k=1:length(d_data) %for each participant
         subj=load(d_data{k});
         subj_id=fieldnames(subj);
@@ -14,25 +13,21 @@ for m=1:length(subject_id)
         info=subj.info;
         position_matrix=[];
     
-        for j=1:length(data) %for each trial
-            freqs_all=data{j,1}.signal_gaus_band_hilb_dec_zs_parsed;
-            freqs_all_cell=cell(size(freqs_all,1),1);
-            for i=1:size(freqs_all,1)
-                freqs_all_cell{i,1}=[freqs_all{i,1}, freqs_all{i,2}, freqs_all{i,3}, freqs_all{i,4}, freqs_all{i,5}];
+       for j=1:length(data)
+            pretrial_data=data{j,1}.signal_pre_trial_gaus_band_hilb_dec_zs;
+            new=cellfun(@(y) cell2mat(cellfun(@(x) mean(x,2), mat2cell(y,[size(y,1)],ones(1,5)*size(y,2)/5), 'uni', false)),pretrial_data,'uni',false);
+            data{j,1}.new_window_pretrial_comb=new;
+
+            stim_data=data{j,1}.signal_gaus_band_hilb_dec_zs_parsed;
+            new=cellfun(@(y) cell2mat(cellfun(@(x) mean(x,2), mat2cell(y,[size(y,1)],ones(1,5)*size(y,2)/5), 'uni', false)),stim_data,'uni',false);
+            new_combined=cell(size(new,1),1);
+            for i=1:size(new,1)
+                temp=new(i,:);
+                temp=cell2mat(transpose(temp));
+                new_combined{i,1}=temp;
             end
-            elec=freqs_all_cell;
-            elec_cell=cell(length(elec),1);
-            for i=1:length(elec)
-                pos=elec{i,1};
-                pos_mat=zeros(5*length(pos),1);
-                for h=1:length(pos)
-                    temp=transpose(pos(h,:));
-                    pos_mat(h+4*(h-1):5*h)=temp;
-                end
-                elec_cell{i,1}=pos_mat;
-            end
-            data{j,1}.combined_signal_gaus_zs_parsed=freqs_all_cell;
-            data{j,1}.combined_electrodes=elec_cell;
+            data{j,1}.new_window_comb=new_combined;   
+            
             if isempty(data{j,1}.trial_string) %fixation trial
                 position_matrix=cat(1, position_matrix, -1);
             else

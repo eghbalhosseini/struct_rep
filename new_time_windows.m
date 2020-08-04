@@ -1,6 +1,13 @@
 function output=new_time_windows(combine_participants,correct,lang_resp,stim)
-    data_path=%Put your data path here 
-    subject_id={'AMC026','AMC029','AMC031','AMC037','AMC038','AMC044'};
+% combine_participants -> true or false
+% correct -> true or false, determines if only correct trials are used
+% lang_resp -> true or false, determines if only lang resp elecs are used
+% stim -> string: probe, preprobe, pretrial, postprobe
+
+
+    data_path='C:\Users\kirsi\Documents\data'%Put your data path here 
+%     subject_id={'AMC026','AMC029','AMC031','AMC037','AMC038','AMC044'};
+    subject_id={'AMC037'}
     
     if combine_participants
         combine_elecs_all_sent_word=[];
@@ -27,22 +34,6 @@ function output=new_time_windows(combine_participants,correct,lang_resp,stim)
 
             sent_window_probe_tens=[];
             wlist_window_probe_tens=[];
-
-            for j=1:length(data)
-                pretrial_data=data{j,1}.signal_pre_trial_gaus_band_hilb_dec_zs;
-                new=cellfun(@(y) cell2mat(cellfun(@(x) mean(x,2), mat2cell(y,[size(y,1)],ones(1,5)*size(y,2)/5), 'uni', false)),pretrial_data,'uni',false);
-                data{j,1}.new_window_pretrial_comb=new;
-
-                stim_data=data{j,1}.signal_gaus_band_hilb_dec_zs_parsed;
-                new=cellfun(@(y) cell2mat(cellfun(@(x) mean(x,2), mat2cell(y,[size(y,1)],ones(1,5)*size(y,2)/5), 'uni', false)),stim_data,'uni',false);
-                new_combined=cell(size(new,1),1);
-                for i=1:size(new,1)
-                    temp=new(i,:);
-                    temp=cell2mat(transpose(temp));
-                    new_combined{i,1}=temp;
-                end
-                data{j,1}.new_window_comb=new_combined;   
-            end
 
             if correct
                 data_out=extract_condition_response(data,info,'S','word',true,true);
@@ -143,13 +134,13 @@ function output=new_time_windows(combine_participants,correct,lang_resp,stim)
             sent_window_probe_tens=sent_window_probe_tens.*repmat(scale_matrix,1,5);
             wlist_window_probe_tens=wlist_window_probe_tens.*repmat(scale_matrix,1,5);
         end
-        
+        %% New Section
         if combine_participants
             combine_elecs_all_sent_word=cat(1,combine_elecs_all_sent_word, sent_window_word_tens);
             combine_elecs_all_wlist_word=cat(1,combine_elecs_all_wlist_word, wlist_window_word_tens);
 
-            combine_elecs_all_sent_probe=cat(1,combine_elecs_all_sent_probe, sent_probe_combined_elecs);
-            combine_elecs_all_wlist_probe=cat(1,combine_elecs_all_wlist_probe, wlist_probe_combined_elecs);
+            combine_elecs_all_sent_probe=cat(1,combine_elecs_all_sent_probe, sent_window_probe_tens);
+            combine_elecs_all_wlist_probe=cat(1,combine_elecs_all_wlist_probe, wlist_window_probe_tens);
      
             break %from m loop -> only need one figure
         else
@@ -157,7 +148,7 @@ function output=new_time_windows(combine_participants,correct,lang_resp,stim)
         end
     end
     if combine_participants
-        %% Compute cosine distance
+        %% Cosine Angles
         %sentence
         word_tensor=combine_elecs_all_sent_word;
         probe_tensor=combine_elecs_all_sent_probe;
@@ -181,17 +172,18 @@ function output=new_time_windows(combine_participants,correct,lang_resp,stim)
             end    
         end
  
-        starter=%your data path here (specify probe type w/ stim input variabe)
-        if ~lang_resp & ~correct
-            figname=starter;
-        elseif ~lang_resp & correct
-            figname=strcat(starter,'_correct');
-        elseif lang_resp & ~correct
-            figname=strcat(starter,'_lang_resp');
-        else
-            figname=strcat(starter,'_correct_lang_resp');
-        end
-        savefig(figname);
+%         starter=%your data path here (specify probe type w/ stim input variabe)
+%         if ~lang_resp & ~correct
+%             figname=starter;
+%         elseif ~lang_resp & correct
+%             figname=strcat(starter,'_correct');
+%         elseif lang_resp & ~correct
+%             figname=strcat(starter,'_lang_resp');
+%         else
+%             figname=strcat(starter,'_correct_lang_resp');
+%         end
+%         savefig(figname);
+        figname='haha';
     end
     output=figname;
 end
