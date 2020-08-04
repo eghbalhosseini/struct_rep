@@ -1,7 +1,7 @@
-data_path='C:\Users\kirsi\Documents\data\updated_files';
+data_path='C:\Users\kirsi\Documents\data';
 subject_id={'AMC026','AMC029','AMC031','AMC037','AMC038','AMC044'};
 for m=1:length(subject_id)
-    d_data= dir(strcat(data_path,'\',subject_id{1,m},'*_crunched_v3_compressed.mat'));
+    d_data= dir(strcat(data_path,'\',subject_id{1,m},'*_crunched_v3.mat'));
     fprintf(' %d .mat files were found \n', length(d_data));
     d_data=arrayfun(@(x) strcat(d_data(x).folder,'\',d_data(x).name),[1:length(d_data)]','uni',false);
     hilb_ave_cond_contrast_vec=[];

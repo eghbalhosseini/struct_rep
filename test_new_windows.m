@@ -85,13 +85,14 @@ for i=1:size(sent_window_word_tens,3)
     angles{1,i}=temp_angs;
 end
 
+%% Next section
+figure;
 for i=1:length(angles)
-    blah=figure;
     for j=1:length(angles{1,i})
-        subplot(2,4,j);
+        subplot(length(angles),length(angles{1,i}),j*i+(7-(j-1))*(i-1));
         imagesc(angles{1,i}{j,1});
-        colorbar();
     end
 end
+
     
     

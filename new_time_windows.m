@@ -172,18 +172,16 @@ function output=new_time_windows(combine_participants,correct,lang_resp,stim)
         strings={'S','W'};
         angs={sent_angles, wlist_angles};
         for h=1:length(angs)
+            figure;
             for i=1:length(angs{1,h})
-                figure;
                 for j=1:length(angs{1,h}{1,i})
-                    subplot(2,4,j);
+                    subplot(length(angs{1,h}),length(angs{1,h}{1,i}),j*i+(7-(j-1))*(i-1));
                     imagesc(angs{1,h}{1,i}{j,1});
-                    colorbar();
-                    title(strcat('Angle b/w ',strings{1,h},' & probe: position ',num2str(i));
                 end
-            end
+            end    
         end
  
-        starter=%your data path here
+        starter=%your data path here (specify probe type w/ stim input variabe)
         if ~lang_resp & ~correct
             figname=starter;
         elseif ~lang_resp & correct
