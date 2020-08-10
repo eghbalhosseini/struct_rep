@@ -4,10 +4,10 @@ home ;
 num_of_permutation=1000; 
 p_threshold=0.01;
 %% specify where the data is
-subject_id={'AMC026','AMC029','AMC031','AMC037','AMC038','AMC044'};
-data_path='C:\Users\kirsi\Documents\data';
+subject_id={'AMC029','AMC031','AMC037','AMC038','AMC044'};
+data_path='C:\Users\kirsi\Dropbox\struct_rep_data';
 for m=1:length(subject_id)
-    d_data= dir(strcat(data_path,'\',subject_id{1,m},'*_crunched_v3.mat'));
+    d_data= dir(strcat(data_path,'\',subject_id{1,m},'*_crunched_v4_compressed.mat'));
     d_data=arrayfun(@(x) strcat(d_data(x).folder,'\',d_data(x).name),[1:length(d_data)]','uni',false);
     fprintf('%d .mat files were found \n',length(d_data))
     hilb_ave_cond_contrast_vec=[];
@@ -75,8 +75,8 @@ for m=1:length(subject_id)
         subj=subj.(subj_id{1});
         data=subj.data;
         info=subj.info;
-        info.sig_chans_single_freq=ch_significant;
-        info.sig_and_pos_chans_single_freq=ch_significant_and_positive;
+        info.sig_chans_combine_elecs=ch_significant;
+        info.sig_and_pos_chans_combine_elecs=ch_significant_and_positive;
         if size(info.valid_channels,1)<size(info.valid_channels,2)
             info.valid_channels=transpose(info.valid_channels);
         end
