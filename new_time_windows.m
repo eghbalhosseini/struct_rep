@@ -1,12 +1,12 @@
-function output=new_time_windows(combine_participants,correct,lang_resp,stim)
+function output=new_time_windows(combine_participants,correct,lang_resp,stim,all,first_probe,first_word)
 % combine_participants -> true or false
 % correct -> true or false, determines if only correct trials are used
 % lang_resp -> true or false, determines if only lang resp elecs are used
 % stim -> string: probe, preprobe, pretrial, postprobe
 
 
-    data_path='C:\Users\kirsi\Dropbox\struct_rep_data'%Put your data path here 
-    subject_id={'AMC029','AMC031','AMC037'};
+    data_path='C:\Users\kirsi\Dropbox\struct_rep_data';
+    subject_id={'AMC026','AMC029','AMC031','AMC037','AMC038','AMC044'};
     if combine_participants
         combine_elecs_all_sent_word=[];
         combine_elecs_all_wlist_word=[];
@@ -150,7 +150,44 @@ function output=new_time_windows(combine_participants,correct,lang_resp,stim)
             sent_window_probe_tens=sent_window_probe_tens.*repmat(scale_matrix,1,size(sent_window_probe_tens,2));
             wlist_window_probe_tens=wlist_window_probe_tens.*repmat(scale_matrix,1,size(sent_window_probe_tens,2));
         end
-        %% New Section
+        %% take windows you want to work with
+        tag='all_windows';
+        if ~all
+            if first_probe
+                sent_window_probe_tens=sent_window_probe_tens(:,1:2,:);
+                wlist_window_probe_tens=wlist_window_probe_tens(:,1:2,:);
+                tag='first_probe';
+            else
+                sent_window_probe_tens=sent_window_probe_tens(:,5:6,:);
+                wlist_window_probe_tens=wlist_window_probe_tens(:,5:6,:);
+                tag='last_probe';
+            end
+            
+            num_sent=(size(sent_window_word_tens,2)/8);
+            num_word=(size(wlist_window_word_tens,2)/8);
+            temp_sent=zeros(size(sent_window_word_tens,1),16,size(sent_window_word_tens,3));
+            temp_wlist=zeros(size(wlist_window_word_tens,1),16,size(wlist_window_word_tens,3));
+            if first_word
+                for j=1:8
+                    temp_sent(:,2*j-1:2*j,:)=sent_window_word_tens(:,1+num_sent*(j-1):2+num_sent*(j-1),:);
+                    temp_wlist(:,2*j-1:2*j,:)=wlist_window_word_tens(:,1+num_word*(j-1):2+num_word*(j-1),:);
+                end
+                sent_window_word_tens=temp_sent;
+                wlist_window_word_tens=temp_wlist;
+                tag=strcat(tag,'_first_word');
+            else
+                for j=1:8
+                    temp_sent(:,2*j-1:2*j,:)=sent_window_word_tens(:,4+num_sent*(j-1):5+num_sent*(j-1),:);
+                    temp_wlist(:,2*j-1:2*j,:)=wlist_window_word_tens(:,4+num_word*(j-1):5+num_word*(j-1),:);
+                end
+                sent_window_word_tens=temp_sent;
+                wlist_window_word_tens=temp_wlist;
+                tag=strcat(tag,'_last_word');
+            end
+        end
+        
+        
+        %% Combine sub tensors or make separate sub figs                
         if combine_participants
             combine_elecs_all_sent_word=cat(1,combine_elecs_all_sent_word, sent_window_word_tens);
             combine_elecs_all_wlist_word=cat(1,combine_elecs_all_wlist_word, wlist_window_word_tens);
@@ -159,11 +196,46 @@ function output=new_time_windows(combine_participants,correct,lang_resp,stim)
             combine_elecs_all_wlist_probe=cat(1,combine_elecs_all_wlist_probe, wlist_window_probe_tens);
      
         else
-            %not combined subs -> make figures for separate subs
+            %% Agles for each sub
+            %sentence
+            word_tensor=sent_window_word_tens;
+            probe_tensor=sent_window_probe_tens;
+            sent_angles=angle_new_windows(word_tensor,probe_tensor);
+
+            %wordlist
+            word_tensor=wlist_window_word_tens;
+            probe_tensor=wlist_window_probe_tens;
+            wlist_angles=angle_new_windows(word_tensor,probe_tensor);
+
+            %% Generate figure each sub
+            strings={'sentence','wordlist'};
+            angs={sent_angles, wlist_angles};
+            for h=1:length(angs)
+                figure;
+                for i=1:length(angs{1,h})
+                    for j=1:length(angs{1,h}{1,i})
+                        subplot(length(angs{1,h}),length(angs{1,h}{1,i}),j*i+(7-(j-1))*(i-1));
+                        imagesc(angs{1,h}{1,i}{j,1});
+                        colorbar();
+                    end
+                end
+                starter=strcat('C:\Users\kirsi\Documents\data\analysis\important_figures\new_windows\',subject_id{1,m},'\',tag,'\',strings{1,h},'\',stim,'\',stim);
+                if ~lang_resp & ~correct
+                    figname=starter;
+                elseif ~lang_resp & correct
+                    figname=strcat(starter,'_correct');
+                elseif lang_resp & ~correct
+                    figname=strcat(starter,'_lang_resp');
+                else
+                    figname=strcat(starter,'_correct_lang_resp');
+                end
+                savefig(figname);
+            end
         end
     end
+    
     if combine_participants
-        %% Cosine Angles
+        %% Angles all subs
         %sentence
         word_tensor=combine_elecs_all_sent_word;
         probe_tensor=combine_elecs_all_sent_probe;
@@ -174,30 +246,22 @@ function output=new_time_windows(combine_participants,correct,lang_resp,stim)
         probe_tensor=combine_elecs_all_wlist_probe;
         wlist_angles=angle_new_windows(word_tensor,probe_tensor);
 
-        %% Generate figure
+        %% Generate figure all subs
         strings={'sentence','wordlist'};
+        tstrings={'S','W'};
+        titles={'first p first w', 'first p last w', 'last p first w', 'last p first w'};
         angs={sent_angles, wlist_angles};
+
         for h=1:length(angs)
             figure;
-            for i=1:length(angs{1,h})
-                for j=1:length(angs{1,h}{1,i})
-                    subplot(length(angs{1,h}),length(angs{1,h}{1,i}),j*i+(7-(j-1))*(i-1));
-                    imagesc(angs{1,h}{1,i}{j,1});
-                    colorbar();
-                end
+            for i=1:4
+                subplot(2,2,i);
+                imagesc(cell2mat(angs{1,h}{1,i}));
+                colorbar();
+                title(strcat(tstrings{1,h},', ',titles{1,i}));
             end
-%             title(strcat('Angles b/w ',strings{1,h},' and ',stim))
-%             ylabel('Probe position')
-%             xlabel('Word stim number')
-            if length(subject_id)==1
-                starter=strcat('C:\Users\kirsi\Documents\data\analysis\important_figures\new_windows\',subject_id{1,1},'\',strings{1,h},'\',stim,'\',stim)
-            else
-                if subject_id{1,1}=='AMC026'
-                    starter=strcat('C:\Users\kirsi\Documents\data\analysis\important_figures\new_windows\combine_1\',strings{1,h},'\',stim,'\',stim);
-                else
-                    starter=strcat('C:\Users\kirsi\Documents\data\analysis\important_figures\new_windows\combine_2\',strings{1,h},'\',stim,'\',stim);
-                end
-            end
+            
+            starter=strcat('C:\Users\kirsi\Documents\data\analysis\important_figures\new_windows\combine\',tag,'\new_window_combo\',strings{1,h},'\',stim,'\',stim);
             if ~lang_resp & ~correct
                 figname=starter;
             elseif ~lang_resp & correct
@@ -209,7 +273,29 @@ function output=new_time_windows(combine_participants,correct,lang_resp,stim)
             end
             savefig(figname);
         end
-    end
+        
+%         for h=1:length(angs)
+%             figure;
+%             for i=1:length(angs{1,h})
+%                 for j=1:length(angs{1,h}{1,i})
+%                     subplot(length(angs{1,h}),length(angs{1,h}{1,i}),j*i+(7-(j-1))*(i-1));
+%                     imagesc(angs{1,h}{1,i}{j,1});
+%                     colorbar();
+%                 end
+%             end
+            
+%             starter=strcat('C:\Users\kirsi\Documents\data\analysis\important_figures\new_windows\combine\',tag,'\',strings{1,h},'\',stim,'\',stim);
+%             if ~lang_resp & ~correct
+%                 figname=starter;
+%             elseif ~lang_resp & correct
+%                 figname=strcat(starter,'_correct');
+%             elseif lang_resp & ~correct
+%                 figname=strcat(starter,'_lang_resp');
+%             else
+%                 figname=strcat(starter,'_correct_lang_resp');
+%             end
+%             savefig(figname);
+%         end
     output=figname;
 end
             
