@@ -9,7 +9,7 @@ if 1
     addpath(genpath('~/MyCodes/evlab_ecog_tools/'));
 end 
 %% 
- subject_name='AMC038';
+ subject_name='AMC044';
  experiment_name ='SWJN';
 data_path='~/MyData/ecog-sentence/subjects_raw/';
 save_path='~/MyData/struct_rep/crunched/';
@@ -270,83 +270,102 @@ for i=1:length(d_files)
 end
 
 %% create a compressed version of the dataset
-clear all 
-close all 
-subject_id='AMC038';
+clear all
+close all
 experiment_name ='SWJN';
-
+window_ms=90;% ms
 if ispc
-    % kirsi's computer 
-    data_path='C:\Users\kirsi\Documents\Git\UROP\struct_rep\data'; 
+    % kirsi's computer
+    data_path='C:\Users\kirsi\Documents\Git\UROP\struct_rep\data';
     analysis_path=strcat(data_path,'analysis\distributed_oscilatory_power\');
-    d_data= dir(strcat(data_path,'\',subject_id,'*_crunched_v3.mat')); 
-    d_data=arrayfun(@(x) strcat(d_data(x).folder,'\',d_data(x).name),[1:length(d_data)]','uni',false); %change '/'
-else 
-    % eghbal's computer 
+    
+else
+    % eghbal's computer
     data_path='~/MyData/struct_rep/crunched/';
     analysis_path=strcat(data_path,'analysis/distributed_oscilatory_power/');
-    d_data= dir(strcat(data_path,'/',subject_id,'*_crunched_v3.mat')); 
-    d_data=arrayfun(@(x) strcat(d_data(x).folder,'/',d_data(x).name),[1:length(d_data)]','uni',false); %change '/'
-end 
-fprintf(' %d .mat files were found \n', length(d_data));
+end
 %
-for k=1:length(d_data)
-    subj=load(d_data{k});
-    subj_id=fieldnames(subj);
-    subj=subj.(subj_id{1});
-    data=subj.data;
-    info=subj.info;
-    
-    data_1={};
-    for kk=1:length(data)
-        trial=data{kk};
-        trial_1=struct;
-        trial_fields=fieldnames(trial);
-        cell_fields=find(structfun(@iscell,trial));
+%subject_id={'AMC026'};%,'AMC029','AMC031','AMC037','AMC038','AMC044'};
+subject_id={'AMC029','AMC031','AMC037','AMC038','AMC044'};
+for m=1:length(subject_id)
+    d_data= dir(strcat(data_path,filesep,subject_id{m},'*_crunched_v3.mat'));
+    d_data=arrayfun(@(x) strcat(d_data(x).folder,filesep,d_data(x).name),[1:length(d_data)]','uni',false); %change '/'
+    fprintf(' %d .mat files were found \n', length(d_data));
+    for k=1:length(d_data)
+        subj=load(d_data{k});
+        subj_id=fieldnames(subj);
+        subj=subj.(subj_id{1});
+        data=subj.data;
+        info=subj.info;
+        f_s=info.sample_rate;
+        dc_ratio=info.decimation_factor;
+        data_1={};
+        window_len=floor(f_s*(window_ms/1e3)/dc_ratio);
+        for kk=1:length(data)
+            trial=data{kk};
+            trial_1=struct;
+            trial_fields=fieldnames(trial);
+            cell_fields=find(structfun(@iscell,trial));
+            
+            % add the string stuff
+            non_signal_fields=find(~contains(trial_fields,'signal'));
+            trash_fields=find(contains(trial_fields,{'keydown';'keyup';'isRight'}));
+            non_signal_fields=setdiff(non_signal_fields,trash_fields);
+            for t=non_signal_fields',trial_1.(trial_fields{t})=trial.(trial_fields{t});end
+            % add the signal ave stuff
+            signal_ave_fields=find(contains(trial_fields,'signal_ave'));
+            for t=signal_ave_fields',trial_1.(trial_fields{t})=trial.(trial_fields{t});end
+            % signal pre trial stuff
+            signal_pre_fields=find(contains(trial_fields,'signal_pre'));
+            for t=signal_pre_fields'
+                if iscell(trial.(trial_fields{t}))
+                    trial_1.(trial_fields{t})=cellfun(@(x) mean(x,2),trial.(trial_fields{t}),'uni',false);
+                    % smaller window:
+                    signal_win=cellfun(@(x) x(:,1:window_len*floor(size(x,2)/window_len)),trial.(trial_fields{t}),'uni',false);
+                    trial_1.(strcat(trial_fields{t},'_win'))=cellfun(@(y) cell2mat(...
+                        cellfun(@(x) mean(x,2),mat2cell(y,[size(y,1)],ones(1,size(y,2)/window_len)*window_len), 'uni', false)),...
+                        signal_win,'uni',false);
+                else
+                    trial_1.(trial_fields{t})=nanmean(trial.(trial_fields{t}),2);
+                end
+            end
+            % add the signal stuff,
+            signal_fields=find(contains(trial_fields,'signal'));
+            signal_fields=setdiff(signal_fields,signal_ave_fields);
+            signal_fields=setdiff(signal_fields,signal_pre_fields);
+            % do averaging for signal in cells
+            signal_cell_fields=intersect(cell_fields,signal_fields);
+            % get trial_timewidth
+            word_loc=contains(trial.stimuli_type,'word');
+            for t=signal_cell_fields'
+                stim_time=cellfun(@(x) size(x,2),trial.(trial_fields{t}));
+                word_time=unique(stim_time(word_loc));
+                trial_signal=trial.(trial_fields{t});
+                trial_signal_for_ave=cellfun(@(x) x(:,1:min([size(x,2),word_time])),trial_signal,'uni',false);
+                if word_loc
+                    assert(unique(max(cell2mat(cellfun(@(x) size(x,2),trial_signal_for_ave,'uni',false))))==word_time,'averaging window is incorrect');
+                end
+                trial_1.(trial_fields{t})=cellfun(@(x) mean(x,2),trial_signal_for_ave,'uni',false);
+                signal_win=cellfun(@(x) x(:,1:window_len*floor(size(x,2)/window_len)),trial.(trial_fields{t}),'uni',false);
+                trial_1.(strcat(trial_fields{t},'_win'))=cellfun(@(y) cell2mat(...
+                    cellfun(@(x) mean(x,2),mat2cell(y,[size(y,1)],ones(1,size(y,2)/window_len)*window_len), 'uni', false)),...
+                    signal_win,'uni',false);
+                
+                
+            end
+            trial_1.ave_window_time=word_time;
+            data_1{kk,1}=trial_1;
+            fprintf('trial %d \n',kk)
+        end
+        eval(strcat(info.subject,'_',info.session_name,'.data=data_1')) ;
+        eval(strcat(info.subject,'_',info.session_name,'.info=info'));
+        %save(strcat(d(i).folder,'/',d(i).name),'data','info','-v7.3');
         
-        % add the string stuff
-        non_signal_fields=find(~contains(trial_fields,'signal'));
-        for t=non_signal_fields',trial_1.(trial_fields{t})=trial.(trial_fields{t});end 
-        % add the signal ave stuff
-        signal_ave_fields=find(contains(trial_fields,'signal_ave'));
-        for t=signal_ave_fields',trial_1.(trial_fields{t})=trial.(trial_fields{t});end
-        % signal pre trial stuff 
-        signal_pre_fields=find(contains(trial_fields,'signal_pre'));
-        for t=signal_pre_fields'
-            if iscell(trial.(trial_fields{t}))
-                trial_1.(trial_fields{t})=cellfun(@(x) mean(x,2),trial.(trial_fields{t}),'uni',false);
-            else 
-                trial_1.(trial_fields{t})=nanmean(trial.(trial_fields{t}),2);
-            end 
-        end 
-        % add the signal stuff,
-        signal_fields=find(contains(trial_fields,'signal'));
-        signal_fields=setdiff(signal_fields,signal_ave_fields);
-        signal_fields=setdiff(signal_fields,signal_pre_fields);
-        % do averaging for signal in cells 
-        signal_cell_fields=intersect(cell_fields,signal_fields);
-        % get trial_timewidth
-        word_loc=contains(trial.stimuli_type,'word');
-        for t=signal_cell_fields'
-            stim_time=cellfun(@(x) size(x,2),trial.(trial_fields{t}));
-            word_time=unique(stim_time(word_loc));
-            trial_signal=trial.(trial_fields{t});
-            trial_signal_for_ave=cellfun(@(x) x(:,1:min([size(x,2),word_time])),trial_signal,'uni',false);
-            if word_loc
-                assert(unique(max(cell2mat(cellfun(@(x) size(x,2),trial_signal_for_ave,'uni',false))))==word_time,'averaging window is incorrect');
-            end 
-            trial_1.(trial_fields{t})=cellfun(@(x) mean(x,2),trial_signal_for_ave,'uni',false);
-        end 
-        % do averaging for signal in non cells 
-        trial_1.ave_window_time=word_time;
-        data_1{kk,1}=trial_1;
+        save(strrep(d_data{k},'crunched_v3','crunched_v4_compressed'),strcat(info.subject,'_',info.session_name),'-v7.3');
+        clear data_1 data subj;
+        eval(sprintf('clear %s', [info.subject,'_',info.session_name]));
+        fprintf('compressed %s. \n', d_data{k});
+        fprintf('one out of %d .mat files done \n',length(d_data))
     end
-    
-    eval(strcat(info.subject,'_',info.session_name,'.data=data_1')) ;
-    eval(strcat(info.subject,'_',info.session_name,'.info=info'));
-    %save(strcat(d(i).folder,'/',d(i).name),'data','info','-v7.3');
-
-    save(strrep(d_data{k},'crunched_v3','crunched_v3_compressed'),strcat(info.subject,'_',info.session_name),'-v7.3');
-    clear data_1 data subj;
-    fprintf('compressed %s. \n', d_data{k});
-end 
+    fprintf('one participant done \n')
+end

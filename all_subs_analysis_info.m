@@ -1,9 +1,12 @@
 data_path='C:\Users\kirsi\Documents\data';
+data_path='/Users/eghbalhosseini/MyData/struct_rep/crunched';
 subject_id={'AMC026','AMC029','AMC031','AMC037','AMC038','AMC044'};
+window_len=75;% ms
+num_division=5;
 for m=1:length(subject_id)
-    d_data= dir(strcat(data_path,'\',subject_id{1,m},'*_crunched_v3.mat'));
+    d_data= dir(strcat(data_path,filesep,subject_id{1,m},'*_crunched_v3.mat'));
     fprintf(' %d .mat files were found \n', length(d_data));
-    d_data=arrayfun(@(x) strcat(d_data(x).folder,'\',d_data(x).name),[1:length(d_data)]','uni',false);
+    d_data=arrayfun(@(x) strcat(d_data(x).folder,filesep,d_data(x).name),[1:length(d_data)]','uni',false);
 
     for k=1:length(d_data) %for each participant
         subj=load(d_data{k});
