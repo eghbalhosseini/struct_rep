@@ -1,4 +1,6 @@
-%%Separate tensor at change indices, take averages, put back together
+%%Use in conjunction with combine_elec_analysis & new_analysis_code
+
+%% Separate tensor at change indices, take averages, put back together
 function output=probe_pos_ave_trials(change, tensor)
     if isempty(change)
         new_tensor=mean(tensor,3);

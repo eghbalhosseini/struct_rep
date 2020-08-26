@@ -1,6 +1,8 @@
+%%Function to create figures with several different parameters. Like
+%%combine_elec_analysis, but has only S & W conditions, has option to make figures with only one freq,
+%%(combined_elecs=False), and only uses probe positions 1-8 instead of including 0 (no probe present in sequence)
+
 function output=new_analysis_code(combined_subs,combined_elecs,stim,lang_resp,correct) 
-    close all
-    home 
     %% specify where the data is
     if combined_elecs
         data_path='C:\Users\kirsi\Dropbox\struct_rep_data'; 
@@ -225,17 +227,34 @@ function output=new_analysis_code(combined_subs,combined_elecs,stim,lang_resp,co
 
 
     %% figure
+    max_sent=max(cell2mat(transpose(sentence_angles_all)),[],'all');
+    min_sent=min(cell2mat(transpose(sentence_angles_all)),[],'all');
+    max_wlist=max(cell2mat(transpose(wlist_angles_all)),[],'all');
+    min_wlist=min(cell2mat(transpose(wlist_angles_all)),[],'all');
+    
+    total_max=max([max_sent,max_wlist],[],'all');
+    total_min=min([min_sent,min_wlist],[],'all');
+    
     strings=['S','W'];
     angs={sentence_angles_all, wlist_angles_all};
     figure;
-    for i=1:length(strings)
-        subplot(1,2,i);
-        imagesc(cell2mat(transpose(angs{1,i})));
-        colorbar();
-        title(strcat('angle b/w ',strings(1,i),' & probe'));
-        xlabel('word position');
-        ylabel('probe position');
-    end
+    
+    plot1=axes('position',[0.1 0.6 0.3 0.3]);
+    imagesc(plot1, cell2mat(transpose(angs{1,1})));
+    colorbar(plot1);
+    caxis([total_min total_max]);
+    title(strcat('angle b/w ',strings(1,1),' & probe'));
+    xlabel('word position');
+    ylabel('probe position');
+    
+    plot2=axes('position',[0.6 0.6 0.3 0.3]);
+    imagesc(plot2, cell2mat(transpose(angs{1,2})));
+    colorbar(plot2);
+    caxis([total_min total_max]);
+    title(strcat('angle b/w ',strings(1,2),' & probe'));
+    xlabel('word position');
+    ylabel('probe position');
+
 
     if combined_subs
         starter='C:\Users\kirsi\Documents\data\analysis\important_figures\presentation\combined';
@@ -275,4 +294,3 @@ function output=new_analysis_code(combined_subs,combined_elecs,stim,lang_resp,co
     savefig(figname);
     output=figname;
 end
-

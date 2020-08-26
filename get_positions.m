@@ -1,5 +1,8 @@
-%%Get probe positions in trials corresponding to stim
+%%Take probe position values from info.probe_position_matrix only for
+%%trials with desired condition (S,W,J,N). Use in any script making figures
+
 function output=get_positions(info,data,cond,correct_response)
+    %% Remove Fixation Trials
     positions=info.position_matrix;
     wordtypes=info.word_type;
     pos_right=find(strcmp(info.subject_response,'RIGHT'));
@@ -8,6 +11,8 @@ function output=get_positions(info,data,cond,correct_response)
     positions=positions(pos_desired);
     wordtypes=wordtypes(pos_desired);
     data=data(pos_desired);
+    
+    %% Only use correct trials
     if correct_response
         indices=[];
         for i=1:length(data)
@@ -26,6 +31,8 @@ function output=get_positions(info,data,cond,correct_response)
         positions=positions(indices);
         wordtypes=wordtypes(indices);
     end
+    
+    %% Create vector with probe positions of desired condition trials
     relevant_wtype=find(strcmp(wordtypes,cond)); %indices of wordtypes corresponding to stim
     relevant_pos=positions(relevant_wtype);
     output=relevant_pos;

@@ -1,20 +1,21 @@
+%%Calculate angles for each trial and then average angles for each probe
+%%position --> Done for each subject separately (not combined)
+
 %% specify where the data is
-data_path='C:\Users\kirsi\Documents\Git\UROP\struct_rep\data\ave_window_time'; 
-subject_id={'AMC026','AMC029','AMC031','AMC037','AMC038'};
+data_path='C:\Users\kirsi\Dropbox\struct_rep_data'; 
+subject_id={'AMC026','AMC029','AMC031','AMC037','AMC038','AMC044'};
+
 for m=1:length(subject_id)
-    d_data= dir(strcat(data_path,'\',subject_id{1,m},'*_crunched_v3_compressed.mat')); 
+    d_data= dir(strcat(data_path,'\',subject_id{1,m},'*_crunched_v4_compressed.mat')); 
     d_data=arrayfun(@(x) strcat(d_data(x).folder,'\',d_data(x).name),[1:length(d_data)]','uni',false);
     fprintf('%d .mat files found',length(d_data))
+    
 
     sent_word_combined_elecs=[];
     sent_probe_combined_elecs=[];
     wlist_word_combined_elecs=[];
     wlist_probe_combined_elecs=[];
-    jab_word_combined_elecs=[];
-    jab_probe_combined_elecs=[];
-    non_word_combined_elecs=[];
-    non_probe_combined_elecs=[];
-
+  
     for k=1:length(d_data)
         subj=load(d_data{k});
         subj_id=fieldnames(subj);
@@ -22,36 +23,22 @@ for m=1:length(subject_id)
         data=subj.data;
         info=subj.info;
 
-        data_out_all=extract_condition_response(data,info,'S','word',false,true);
+        data_out_all=extract_condition_response(data,info,'S','word',true,talse,true);
         sent_word_combined_elecs=cat(3,sent_word_combined_elecs,data_out_all);
 
-        data_out_all=extract_condition_response(data,info,'S','probe',false,true);
+        data_out_all=extract_condition_response(data,info,'S','probe',true,false,true);
         sent_probe_combined_elecs=cat(3,sent_probe_combined_elecs,data_out_all);
 
-        data_out_all=extract_condition_response(data,info,'W','word',false,true);
+        data_out_all=extract_condition_response(data,info,'W','word',true,false,true);
         wlist_word_combined_elecs=cat(3,wlist_word_combined_elecs,data_out_all);
 
-        data_out_all=extract_condition_response(data,info,'W','probe',false,true);
+        data_out_all=extract_condition_response(data,info,'W','probe',true,false,true);
         wlist_probe_combined_elecs=cat(3,wlist_probe_combined_elecs,data_out_all);
-
-        data_out_all=extract_condition_response(data,info,'J','word',false,true);
-        jab_word_combined_elecs=cat(3,jab_word_combined_elecs,data_out_all);
-
-        data_out_all=extract_condition_response(data,info,'J','probe',false,true);
-        jab_probe_combined_elecs=cat(3,jab_probe_combined_elecs,data_out_all);
-
-        data_out_all=extract_condition_response(data,info,'N','word',false,true);
-        non_word_combined_elecs=cat(3,non_word_combined_elecs,data_out_all);
-
-        data_out_all=extract_condition_response(data,info,'N','probe',false,true);
-        non_probe_combined_elecs=cat(3,non_probe_combined_elecs,data_out_all);
     end
     %% Sort tensors according to probe positions
     %Create vector with all positions across participants for each condition
     sent_positions=[];
     wlist_positions=[];
-    jab_positions=[];
-    non_positions=[];
 
     for k=1:length(d_data)
         subj=load(d_data{k});
@@ -60,16 +47,16 @@ for m=1:length(subject_id)
         data=subj.data;
         info=subj.info;
 
-        temp_sent_pos=get_positions(info,data,'S',false);
+        temp_sent_pos=get_positions(info,data,'S',true);
         sent_positions=cat(1, sent_positions, temp_sent_pos);
 
-        temp_wlist_pos=get_positions(info,data,'W',false);
+        temp_wlist_pos=get_positions(info,data,'W',true);
         wlist_positions=cat(1, wlist_positions, temp_wlist_pos);
 
-        temp_jab_pos=get_positions(info,data,'J',false);
+        temp_jab_pos=get_positions(info,data,'J',true);
         jab_positions=cat(1, jab_positions, temp_jab_pos);
 
-        temp_non_pos=get_positions(info,data,'N',false);
+        temp_non_pos=get_positions(info,data,'N',true);
         non_positions=cat(1, non_positions, temp_non_pos);
     end
 
@@ -93,14 +80,10 @@ for m=1:length(subject_id)
     %% Only use lang responsive channels
     sent_word_combined_elecs=sent_word_combined_elecs.*repmat(info.sig_and_pos_chans_combine_elecs,1,8);
     wlist_word_combined_elecs=wlist_word_combined_elecs.*repmat(info.sig_and_pos_chans_combine_elecs,1,8);
-    jab_word_combined_elecs=jab_word_combined_elecs.*repmat(info.sig_and_pos_chans_combine_elecs,1,8);
-    non_word_combined_elecs=non_word_combined_elecs.*repmat(info.sig_and_pos_chans_combine_elecs,1,8);
-
+   
     sent_probe_combined_elecs=sent_probe_combined_elecs.*info.sig_and_pos_chans_combine_elecs;
     wlist_probe_combined_elecs=wlist_probe_combined_elecs.*info.sig_and_pos_chans_combine_elecs;
-    jab_probe_combined_elecs=jab_probe_combined_elecs.*info.sig_and_pos_chans_combine_elecs;
-    non_probe_combined_elecs=non_probe_combined_elecs.*info.sig_and_pos_chans_combine_elecs;
-
+   
 %     %% Only use valid channels
 %     if size(sent_word_combined_elecs,1)>length(info.valid_channels)
 %         scale_matrix=zeros(5*length(info.valid_channels),1);
@@ -114,55 +97,61 @@ for m=1:length(subject_id)
 % 
 %     sent_word_combined_elecs=sent_word_combined_elecs.*repmat(scale_matrix,1,8);
 %     wlist_word_combined_elecs=wlist_word_combined_elecs.*repmat(scale_matrix,1,8);
-%     jab_word_combined_elecs=jab_word_combined_elecs.*repmat(scale_matrix,1,8);
-%     non_word_combined_elecs=non_word_combined_elecs.*repmat(scale_matrix,1,8);
 % 
 %     sent_probe_combined_elecs=sent_probe_combined_elecs.*scale_matrix;
 %     wlist_probe_combined_elecs=wlist_probe_combined_elecs.*scale_matrix;
-%     jab_probe_combined_elecs=jab_probe_combined_elecs.*scale_matrix;
-%     non_probe_combined_elecs=non_probe_combined_elecs.*scale_matrix;
 
-    %% Find where probe position changes in each matrix
-    %find indices of sorted pos vec where pos changes
-    sent_changes=diff(sent_positions);
-    sent_change_indices=find(ismember(sent_changes,1));
-    sent_change_indices=sent_change_indices+1;
-
-    wlist_changes=diff(wlist_positions);
-    wlist_change_indices=find(ismember(wlist_changes,1));
-    wlist_change_indices=wlist_change_indices+1;
-
-    jab_changes=diff(jab_positions);
-    jab_change_indices=find(ismember(jab_changes,1));
-    jab_change_indices=jab_change_indices+1;
-
-    non_changes=diff(non_positions);
-    non_change_indices=find(ismember(non_changes,1));
-    non_change_indices=non_change_indices+1;
+    %% Find Angles for every trial, Average angles with same probe position
+    sent_angles=calc_similarities(sent_word_combined_elecs, sent_probe_combined_elecs);
+    wlist_angles=calc_similarities(wlist_word_combined_elecs, wlist_probe_combined_elecs);
+   
+    sent_angles=cell2mat(transpose(sent_angles));
+    wlist_angles=cell2mat(transpose(wlist_angles));
+    sent_angles_copy=sent_angles(:,:);
+    wlist_angles_copy=wlist_angles(:,:);
     
-    %% Calculate angles for each probe position & take average
-    sent_angles=average_angles(sent_word_combined_elecs,sent_probe_combined_elecs,sent_change_indices);
-    sent_angles_mat=cell2mat(sent_angles);
+    averaged_sent_angles=zeros(9,8);
+    averaged_wlist_angles=zeros(9,8);
     
-    wlist_angles=average_angles(wlist_word_combined_elecs,wlist_probe_combined_elecs,wlist_change_indices);
-    wlist_angles_mat=cell2mat(wlist_angles);
-    
-    jab_angles=average_angles(jab_word_combined_elecs,jab_probe_combined_elecs,jab_change_indices);
-    jab_angles_mat=cell2mat(jab_angles);
-    
-    non_angles=average_angles(non_word_combined_elecs,non_probe_combined_elecs,non_change_indices);
-    non_angles_mat=cell2mat(non_angles);
-    
-    %% Create Figures
-    strings={'S','W','J','N'};
-    angs={sent_angles_mat, wlist_angles_mat, jab_angles_mat, non_angles_mat};
-    figure;
-    for i=1:length(strings)
-        subplot(2,2,i);
-        imagesc(angs{1,i});
-        colorbar();
-        title(strcat('angle b/w ',strings{1,i},' & probe'));
-        ylabel('trials');
+    for i=0:8
+        temp_sent_angles=sent_angles_copy(1:sum(sent_angles_copy==i),:);
+        temp_sent_angles=mean(temp_sent_angles,1);
+        temp_wlist_angles=wlist_angles_copy(1:sum(wlist_angles_copy==i),:);
+        temp_wlist_angles=mean(temp_wlist_angles,1);
+        
+        sent_angles_copy=sent_angles_copy(1+sum(sent_angles_copy==i):end,:);
+        wlist_angles_copy=wlist_anlges_copy(1+sum(wlist_angles_copy==i):end,:);
+        
+        averaged_sent_angles(i+1,:)=temp_sent_angles;
+        averaged_wlist_angles(i+1,:)=temp_wlist_angles;
     end
-    fprintf('one participant done')
+
+    %% Create Figures
+    max_sent=max(averaged_sent_angles,[],'all');
+    min_sent=min(averaged_sent_angles,[],'all');
+    max_wlist=max(averaged_wlist_angles,[],'all');
+    min_wlist=min(averaged_wlist_angles,[],'all');
+
+    total_max=max([max_sent,max_wlist],[],'all');
+    total_min=min([min_sent,min_wlist],[],'all');
+
+    strings=['S','W'];
+    angs={averaged_sent_angles,averaged_wlist_angles};
+    figure;
+
+    plot1=axes('position',[0.1 0.6 0.3 0.3]);
+    imagesc(plot1, angs{1,1});
+    colorbar(plot1);
+    caxis([total_min total_max]);
+    title(strcat('angle b/w ',strings(1,1),' & probe'));
+    xlabel('word position');
+    ylabel('probe position');
+
+    plot2=axes('position',[0.5 0.6 0.3 0.3]);
+    imagesc(plot2, angs{1,2});
+    colorbar(plot2);
+    caxis([total_min total_max]);
+    title(strcat('angle b/w ',strings(1,2),' & probe'));
+    xlabel('word position');
+    ylabel('probe position');
 end

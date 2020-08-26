@@ -4,7 +4,6 @@ function output=new_time_windows(combine_participants,correct,lang_resp,stim,all
 % lang_resp -> true or false, determines if only lang resp elecs are used
 % stim -> string: probe, preprobe, pretrial, postprobe
 
-
     data_path='C:\Users\kirsi\Dropbox\struct_rep_data';
     subject_id={'AMC026','AMC029','AMC031','AMC037','AMC038','AMC044'};
     if combine_participants
@@ -33,6 +32,7 @@ function output=new_time_windows(combine_participants,correct,lang_resp,stim,all
             data=subj.data;
             info=subj.info;
             
+            %% Combine freqs for new windows if not already done
             if ~isfield(data{1,1}, 'combined_win')
                 for j=1:length(data)
                     field=data{j,1}.signal_gaus_band_hilb_dec_zs_parsed_win;
@@ -79,7 +79,7 @@ function output=new_time_windows(combine_participants,correct,lang_resp,stim,all
         end
         
         %% Sort tensors according to probe positions
-        %Create vector with all positions across participants for each condition
+        %Create vector with all positions across trials for each condition
         sent_positions=[];
         wlist_positions=[];
     
@@ -150,6 +150,7 @@ function output=new_time_windows(combine_participants,correct,lang_resp,stim,all
             sent_window_probe_tens=sent_window_probe_tens.*repmat(scale_matrix,1,size(sent_window_probe_tens,2));
             wlist_window_probe_tens=wlist_window_probe_tens.*repmat(scale_matrix,1,size(sent_window_probe_tens,2));
         end
+        
         %% take windows you want to work with
         tag='all_windows';
         if ~all
@@ -187,7 +188,7 @@ function output=new_time_windows(combine_participants,correct,lang_resp,stim,all
         end
         
         
-        %% Combine sub tensors or make separate sub figs                
+        %% Combine subject tensors or make separate subject figs                
         if combine_participants
             combine_elecs_all_sent_word=cat(1,combine_elecs_all_sent_word, sent_window_word_tens);
             combine_elecs_all_wlist_word=cat(1,combine_elecs_all_wlist_word, wlist_window_word_tens);
@@ -249,7 +250,7 @@ function output=new_time_windows(combine_participants,correct,lang_resp,stim,all
         %% Generate figure all subs
         strings={'sentence','wordlist'};
         tstrings={'S','W'};
-        titles={'first p first w', 'first p last w', 'last p first w', 'last p first w'};
+        titles={'first p first w', 'first p last w', 'last p first w', 'last p last w'};
         angs={sent_angles, wlist_angles};
 
         for h=1:length(angs)
@@ -274,28 +275,7 @@ function output=new_time_windows(combine_participants,correct,lang_resp,stim,all
             savefig(figname);
         end
         
-%         for h=1:length(angs)
-%             figure;
-%             for i=1:length(angs{1,h})
-%                 for j=1:length(angs{1,h}{1,i})
-%                     subplot(length(angs{1,h}),length(angs{1,h}{1,i}),j*i+(7-(j-1))*(i-1));
-%                     imagesc(angs{1,h}{1,i}{j,1});
-%                     colorbar();
-%                 end
-%             end
-            
-%             starter=strcat('C:\Users\kirsi\Documents\data\analysis\important_figures\new_windows\combine\',tag,'\',strings{1,h},'\',stim,'\',stim);
-%             if ~lang_resp & ~correct
-%                 figname=starter;
-%             elseif ~lang_resp & correct
-%                 figname=strcat(starter,'_correct');
-%             elseif lang_resp & ~correct
-%                 figname=strcat(starter,'_lang_resp');
-%             else
-%                 figname=strcat(starter,'_correct_lang_resp');
-%             end
-%             savefig(figname);
-%         end
+
     output=figname;
 end
             

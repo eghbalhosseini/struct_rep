@@ -1,6 +1,5 @@
-clear all;
-close all;
-home ;
+%% Add fields for lang responsive electrodes for combined elecs (all freqs instead of just one)
+
 num_of_permutation=1000; 
 p_threshold=0.01;
 %% specify where the data is

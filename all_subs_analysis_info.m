@@ -1,4 +1,8 @@
 <<<<<<< HEAD
+%% Add combined electrode (combine freqs) fields & position matrix to updated files
+
+=======
+<<<<<<< HEAD
 data_path='C:\Users\kirsi\Documents\data';
 data_path='/Users/eghbalhosseini/MyData/struct_rep/crunched';
 subject_id={'AMC026','AMC029','AMC031','AMC037','AMC038','AMC044'};
@@ -10,8 +14,9 @@ for m=1:length(subject_id)
     d_data=arrayfun(@(x) strcat(d_data(x).folder,filesep,d_data(x).name),[1:length(d_data)]','uni',false);
 
 =======
+>>>>>>> 65c9c0a2ac7aa95b5095b6664ab413ae23142fcd
 data_path='C:\Users\kirsi\Dropbox\struct_rep_data';
-% subject_id={'AMC026','AMC029','AMC031','AMC037','AMC038','AMC044'};\
+% subject_id={'AMC026','AMC029','AMC031','AMC037','AMC038','AMC044'};
 subject_id={'AMC026'}
 for m=1:length(subject_id)
     d_data= dir(strcat(data_path,'\',subject_id{1,m},'*_crunched_v4_compressed.mat'));
