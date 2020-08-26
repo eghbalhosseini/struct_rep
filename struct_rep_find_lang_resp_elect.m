@@ -4,7 +4,7 @@ home ;
 num_of_permutation=1000; 
 p_threshold=0.01;
 %% specify where the data is
-subject_id={'AMC029','AMC031','AMC037','AMC038','AMC044'};
+subject_id={'AMC037'};
 data_path='C:\Users\kirsi\Dropbox\struct_rep_data';
 for m=1:length(subject_id)
     d_data= dir(strcat(data_path,'\',subject_id{1,m},'*_crunched_v4_compressed.mat'));

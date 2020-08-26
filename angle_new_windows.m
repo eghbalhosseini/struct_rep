@@ -38,7 +38,7 @@ function output=angle_new_windows(word,probe)
         end
         norm_prods{1,i}=temp_prods;
     end
-
+    
     dot_prods=cell(1,size(word,3));
     for i=1:size(word,3)
         temp_dots=cell(8,1);
@@ -72,5 +72,39 @@ function output=angle_new_windows(word,probe)
         end
         angles{1,i}=temp_angs;
     end
-    output=angles;
+    
+    %% Make angle matrices with same word vs probe combo from each condition
+    if length(angles{1,i}{1,1})==2
+        first_probe_first_word=cell(1,length(angles));
+        first_probe_last_word=cell(1,length(angles));
+        last_probe_first_word=cell(1,length(angles));
+        last_probe_last_word=cell(1,length(angles));
+
+        for i=1:length(angles)
+            temp_f_f=zeros(length(angles{1,i}),1);
+            temp_f_l=zeros(length(angles{1,i}),1);
+            temp_l_f=zeros(length(angles{1,i}),1);
+            temp_l_l=zeros(length(angles{1,i}),1);
+            for j=1:length(angles{1,i})
+                temp_f_f(j,1)=angles{1,i}{j,1}(1,1);
+                temp_f_l(j,1)=angles{1,i}{j,1}(1,2);
+                temp_l_f(j,1)=angles{1,i}{j,1}(2,1);
+                temp_l_l(j,1)=angles{1,i}{j,1}(2,2);
+            end
+            first_probe_first_word{1,i}=temp_f_f;
+            first_probe_last_word{1,i}=temp_f_l;
+            last_probe_first_word{1,i}=temp_l_f;
+            last_probe_last_word{1,i}=temp_l_l;
+        end
+    end
+        
+    if length(angles{1,i}{1,1})==2
+        output=cell(1,4);
+        output{1,1}=first_probe_first_word;
+        output{1,2}=first_probe_last_word;
+        output{1,3}=last_probe_first_word;
+        output{1,4}=last_probe_last_word;
+    else
+        output=angles;
+    end
 end

@@ -1,42 +1,54 @@
-% combined_preprobe_correct_lang_resp=new_time_windows(true,true,true,'preprobe');
-combined_preprobe_correct=new_time_windows(true,true,false,'preprobe');
-% combined_preprobe_lang_resp=new_time_windows(true,false,true,'preprobe');
-% combined_preprobe=new_time_windows(true,false,false,'preprobe');
-
-% combined_postprobe_correct_lang_resp=new_time_windows(true,true,true,'postprobe');
-% combined_postprobe_correct=new_time_windows(true,true,false,'postprobe');
-% combined_postprobe_lang_resp=new_time_windows(true,false,true,'postprobe');
-% combined_postprobe=new_time_windows(true,false,false,'postprobe');
-
-% combined_probe_correct_lang_resp=new_time_windows(true,true,true,'probe');
-% combined_probe_correct=new_time_windows(true,true,false,'probe');
-% combined_probe_lang_resp=new_time_windows(true,false,true,'probe');
-% combined_probe=new_time_windows(true,false,false,'probe');
-
-% combined_pretrial_correct_lang_resp=new_time_windows(true,true,true,'pretrial');
-% combined_pretrial_correct=new_time_windows(true,true,false,'pretrial');
-% combined_pretrial_lang_resp=new_time_windows(true,false,true,'pretrial');
-% combined_pretrial=new_time_windows(true,false,false,'pretrial');
-
-
-% preprobe_correct_lang_resp=new_time_windows(false,true,true,'preprobe');
-% preprobe_correct=new_time_windows(false,true,false,'preprobe');
-% preprobe_lang_resp=new_time_windows(false,false,true,'preprobe');
-% preprobe=new_time_windows(false,false,false,'preprobe');
+% %% All windows, each sub
+% preprobe_correct_lang_resp=new_time_windows(false,true,true,'preprobe',true,false,false);
+% preprobe=new_time_windows(false,false,false,'preprobe',true,false,false);
 % 
-% postprobe_correct_lang_resp=new_time_windows(false,true,true,'postprobe');
-% postprobe_correct=new_time_windows(false,true,false,'postprobe');
-% postprobe_lang_resp=new_time_windows(false,false,true,'postprobe');
-% postprobe=new_time_windows(false,false,false,'postprobe');
+% probe_correct_lang_resp=new_time_windows(false,true,true,'probe',true,false,false);
+% probe=new_time_windows(false,false,false,'probe',true,false,false);
 % 
-% probe_correct_lang_resp=new_time_windows(false,true,true,'probe');
-% probe_correct=new_time_windows(false,true,false,'probe');
-% probe_lang_resp=new_time_windows(false,false,true,'probe');
-% probe=new_time_windows(false,false,false,'probe');
+% pretrial_correct_lang_resp=new_time_windows(false,true,true,'pretrial',true,false,false);
+% pretrial=new_time_windows(false,false,false,'pretrial',true,false,false);
+% 
+% %% First probe first word, combined
+% combined_preprobe_correct_lang_resp=new_time_windows(true,true,true,'preprobe',false,true,true);
+% combined_preprobe=new_time_windows(true,false,false,'preprobe',false,true,true);
+% 
+combined_probe_correct_lang_resp=new_time_windows(true,true,true,'probe',false,true,true);
+% combined_probe=new_time_windows(true,false,false,'probe',false,true,true);
+% 
+% combined_pretrial_correct_lang_resp=new_time_windows(true,true,true,'pretrial',false,true,true);
+% combined_pretrial=new_time_windows(true,false,false,'pretrial',false,true,true);
 
-% pretrial_correct_lang_resp=new_time_windows(false,true,true,'pretrial');
-% pretrial_correct=new_time_windows(false,true,false,'pretrial');
-% pretrial_lang_resp=new_time_windows(false,false,true,'pretrial');
-% pretrial=new_time_windows(false,false,false,'pretrial');
+% %% First probe last word, combined
+% combined_preprobe_correct_lang_resp=new_time_windows(true,true,true,'preprobe',false,true,false);
+% combined_preprobe=new_time_windows(true,false,false,'preprobe',false,true,false);
+% 
+combined_probe_correct_lang_resp=new_time_windows(true,true,true,'probe',false,true,false);
+% combined_probe=new_time_windows(true,false,false,'probe',false,true,false);
+% 
+% combined_pretrial_correct_lang_resp=new_time_windows(true,true,true,'pretrial',false,true,false);
+% combined_pretrial=new_time_windows(true,false,false,'pretrial',false,true,false);
+
+%% Last probe first word, combined
+% combined_preprobe_correct_lang_resp=new_time_windows(true,true,true,'preprobe',false,false,true);
+% combined_preprobe=new_time_windows(true,false,false,'preprobe',false,false,true);
+
+combined_probe_correct_lang_resp=new_time_windows(true,true,true,'probe',false,false,true);
+% combined_probe=new_time_windows(true,false,false,'probe',false,false,true);
+
+% combined_pretrial_correct_lang_resp=new_time_windows(true,true,true,'pretrial',false,false,true);
+% combined_pretrial=new_time_windows(true,false,false,'pretrial',false,false,true);
+
+%% Last probe last word, combined
+% combined_preprobe_correct_lang_resp=new_time_windows(true,true,true,'preprobe',false,false,false);
+% combined_preprobe=new_time_windows(true,false,false,'preprobe',false,false,false);
+
+combined_probe_correct_lang_resp=new_time_windows(true,true,true,'probe',false,false,false);
+% combined_probe=new_time_windows(true,false,false,'probe',false,false,false);
+
+% combined_pretrial_correct_lang_resp=new_time_windows(true,true,true,'pretrial',false,false,false);
+% combined_pretrial=new_time_windows(true,false,false,'pretrial',false,false,false);
+
+
+
 
 

@@ -1,5 +1,5 @@
 function angle=calc_similarities(word_tensor,probe_tensor)
-    probe_norm=cell(1,9);
+    probe_norm=cell(1,size(probe_tensor,3));
     for i=1:size(probe_tensor,3)
         temp_tensor=probe_tensor(:,:,i);
         new_tensor=[];
@@ -11,7 +11,7 @@ function angle=calc_similarities(word_tensor,probe_tensor)
         new_norm=sqrt(transpose(new_tensor)*new_tensor);
         probe_norm{1,i}=new_norm;
     end
-    words_norm=cell(1,9);
+    words_norm=cell(1,size(word_tensor,3));
     for i=1:size(word_tensor,3)
         temp_tensor=word_tensor(:,:,i);
         new_tensor=[];
@@ -24,7 +24,7 @@ function angle=calc_similarities(word_tensor,probe_tensor)
         words_norm{1,i}=new_norm;
     end
     norm_product=cellfun(@(x,y) transpose(x.*y) ,probe_norm,words_norm,'uni',false);    
-    w_probe_dot=cell(1,9);
+    w_probe_dot=cell(1,size(word_tensor,3));
     for i=1:size(word_tensor,3)
         temp_word=word_tensor(:,:,i);
         temp_probe=probe_tensor(:,:,i);
