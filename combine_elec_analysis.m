@@ -33,52 +33,52 @@ function output=combine_elec_analysis(combine_participants,correct,lang_resp,sti
             data=subj.data;
             info=subj.info;
             if correct
-                data_out_all=extract_condition_response(data,info,'S','word',true);
+                data_out_all=extract_condition_response(data,info,'S','word',true,false);
                 sent_word_combined_elecs=cat(3,sent_word_combined_elecs,data_out_all);
 
-                data_out_all=extract_condition_response(data,info,'S',stim,true);
+                data_out_all=extract_condition_response(data,info,'S',stim,true,false);
                 sent_probe_combined_elecs=cat(3,sent_probe_combined_elecs,data_out_all);
 
-                data_out_all=extract_condition_response(data,info,'W','word',true);
+                data_out_all=extract_condition_response(data,info,'W','word',true,false);
                 wlist_word_combined_elecs=cat(3,wlist_word_combined_elecs,data_out_all);
 
-                data_out_all=extract_condition_response(data,info,'W',stim,true);
+                data_out_all=extract_condition_response(data,info,'W',stim,true,false);
                 wlist_probe_combined_elecs=cat(3,wlist_probe_combined_elecs,data_out_all);
 
-                data_out_all=extract_condition_response(data,info,'J','word',true);
+                data_out_all=extract_condition_response(data,info,'J','word',true,false);
                 jab_word_combined_elecs=cat(3,jab_word_combined_elecs,data_out_all);
 
-                data_out_all=extract_condition_response(data,info,'J',stim,true);
+                data_out_all=extract_condition_response(data,info,'J',stim,true,false);
                 jab_probe_combined_elecs=cat(3,jab_probe_combined_elecs,data_out_all);
 
-                data_out_all=extract_condition_response(data,info,'N','word',true);
+                data_out_all=extract_condition_response(data,info,'N','word',true,false);
                 non_word_combined_elecs=cat(3,non_word_combined_elecs,data_out_all);
 
-                data_out_all=extract_condition_response(data,info,'N',stim,true);
+                data_out_all=extract_condition_response(data,info,'N',stim,true,false);
                 non_probe_combined_elecs=cat(3,non_probe_combined_elecs,data_out_all);
             else %not correct
-                data_out_all=extract_condition_response(data,info,'S','word',false);
+                data_out_all=extract_condition_response(data,info,'S','word',false,false);
                 sent_word_combined_elecs=cat(3,sent_word_combined_elecs,data_out_all);
 
-                data_out_all=extract_condition_response(data,info,'S',stim,false);
+                data_out_all=extract_condition_response(data,info,'S',stim,false,false);
                 sent_probe_combined_elecs=cat(3,sent_probe_combined_elecs,data_out_all);
 
-                data_out_all=extract_condition_response(data,info,'W','word',false);
+                data_out_all=extract_condition_response(data,info,'W','word',false,false);
                 wlist_word_combined_elecs=cat(3,wlist_word_combined_elecs,data_out_all);
 
-                data_out_all=extract_condition_response(data,info,'W',stim,false);
+                data_out_all=extract_condition_response(data,info,'W',stim,false,false);
                 wlist_probe_combined_elecs=cat(3,wlist_probe_combined_elecs,data_out_all);
 
-                data_out_all=extract_condition_response(data,info,'J','word',false);
+                data_out_all=extract_condition_response(data,info,'J','word',false,false);
                 jab_word_combined_elecs=cat(3,jab_word_combined_elecs,data_out_all);
 
-                data_out_all=extract_condition_response(data,info,'J',stim,false);
+                data_out_all=extract_condition_response(data,info,'J',stim,false,false);
                 jab_probe_combined_elecs=cat(3,jab_probe_combined_elecs,data_out_all);
 
-                data_out_all=extract_condition_response(data,info,'N','word',false);
+                data_out_all=extract_condition_response(data,info,'N','word',false,false);
                 non_word_combined_elecs=cat(3,non_word_combined_elecs,data_out_all);
 
-                data_out_all=extract_condition_response(data,info,'N',stim,false);
+                data_out_all=extract_condition_response(data,info,'N',stim,false,false);
                 non_probe_combined_elecs=cat(3,non_probe_combined_elecs,data_out_all);
             end
         end

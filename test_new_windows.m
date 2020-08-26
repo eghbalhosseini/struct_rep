@@ -7,20 +7,16 @@ wlist_window_word_tens=[];
 sent_window_probe_tens=[];
 wlist_window_probe_tens=[];
 
-for j=1:length(data)
-    pretrial_data=data{j,1}.signal_pre_trial_gaus_band_hilb_dec_zs;
-    new_pret=cellfun(@(y) cell2mat(cellfun(@(x) mean(x,2), mat2cell(y,[size(y,1)],ones(1,5)*size(y,2)/5), 'uni', false)),pretrial_data,'uni',false);
-    data{j,1}.new_window_pretrial_comb=new_pret;
+for j=1:length(data);
 
-    stim_data=data{j,1}.signal_gaus_band_hilb_dec_zs_parsed;
-    new_stim=cellfun(@(y) cell2mat(cellfun(@(x) mean(x,2), mat2cell(y,[size(y,1)],ones(1,5)*size(y,2)/5), 'uni', false)),stim_data,'uni',false);
+    stim_data=data{j,1}.signal_gaus_band_hilb_dec_zs_parsed_win;
     new_combined=cell(size(new_stim,1),1);
-    for i=1:size(new_stim,1)
-        temp=new_stim(i,:);
+    for i=1:size(stim_data,1)
+        temp=stim_data(i,:);
         temp=cell2mat(transpose(temp));
         new_combined{i,1}=temp;
     end
-    data{j,1}.new_window_comb=new_combined;   
+    data{j,1}.combined_win=new_combined;   
 end
 
 data_sent_word=extract_condition_response(data,info,'S','word',true,true);

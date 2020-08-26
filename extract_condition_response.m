@@ -27,7 +27,7 @@ function data_out=extract_condition_response(data,info,cond,stim,correct_respons
     data_cond=data(cond_id); %array of trials with only desired condition
     if stim(1:4)=='pret'
         if large_file
-            hilb_zs_ave_cell=cellfun(@(x) cell2mat(transpose(x.new_window_pretrial_comb)), data_cond,'uni',false);
+            hilb_zs_ave_cell=cellfun(@(x) cell2mat(transpose(x.signal_pre_trial_gaus_band_hilb_dec_zs_win)), data_cond,'uni',false);
         else
             hilb_zs_ave_cell=cellfun(@(x) cell2mat(transpose(x.signal_pre_trial_gaus_band_hilb_dec_zs)), data_cond,'uni',false);
         end
@@ -36,7 +36,7 @@ function data_out=extract_condition_response(data,info,cond,stim,correct_respons
         data_out=stim_zs_ave_tensor;  
     else %stim not pretrial
         if large_file
-            hilb_zs_ave_cell=cellfun(@(x) x.new_window_comb, data_cond,'uni',false);
+            hilb_zs_ave_cell=cellfun(@(x) x.combined_win, data_cond,'uni',false);
         else
             hilb_zs_ave_cell=cellfun(@(x) x.combined_electrodes, data_cond,'uni',false);
         end
